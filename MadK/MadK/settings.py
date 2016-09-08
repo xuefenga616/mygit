@@ -53,6 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
+AUTH_USER_MODEL = 'assets.UserProfile'
 ROOT_URLCONF = 'MadK.urls'
 
 TEMPLATES = [
@@ -80,8 +81,12 @@ WSGI_APPLICATION = 'MadK.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'MadK',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '',
+        'PORT': 3306,
     }
 }
 
