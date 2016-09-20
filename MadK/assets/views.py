@@ -1,10 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render,HttpResponse
+import core
+import json
+import models
 
 # Create your views here.
 
 def asset_report(request):
     print request.GET
-
+    if request.method == 'POST':
+        ass_handler = core.Asset(request)
+        if ass_handler.data_is_valid():
+            ass_handler.data_inject()
+        return HttpResponse(json.dumps(ass_handler.response))
+    return HttpResponse('--test--')
 
 def asset_with_no_asset_id(request):
     pass

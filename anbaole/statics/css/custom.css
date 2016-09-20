@@ -1,0 +1,99 @@
+/*! compiled by gulp-sass */
+@charset "UTF-8";.mod-qhh .btn:hover,.mod-qqcm .btn:hover{background:#f9197f}
+.index-outlet .layout,.mod-col-1-7 .layout,.mod-qhh .layout,.mod-qqcm .layout{margin-top:20px}
+.price{font-family:'\5FAE\8F6F\96C5\9ED1',Arial}
+.price .new{color:#fa4b9b}
+.price .old{text-decoration:line-through;color:#999}
+.gds-img img{width:100%}
+.gds-img img:hover{opacity:.88;filter:alpha(opacity=88)}
+body{font:14px/1.5 Tahoma,Arial,"Hiragino Sans GB","微软雅黑",sans-serif}
+.w1100{margin:0 auto;width:1100px}
+.mainSlide{height:480px;position:relative;background:#fff url(http://www.miyabaobei.com/resources/images/loading.gif?v=20150203) no-repeat center center}
+.mainSlide .cell{position:absolute;top:0;left:0;width:100%;z-index:1;display:none;height:480px}
+.mainSlide .cell .w1100{height:480px;position:relative;top:-480px;z-index:2}
+.mainSlide .cur{display:block;z-index:3}
+.mainSlide .cell .prom{background-position:center;background-repeat:no-repeat;height:480px;width:100%;text-align:center;position:relative}
+.mainSlide .cell .promLink{width:1000px;height:480px;display:block}
+.mainSlide .slideNumBox{position:absolute;bottom:15px;left:50%;margin-left:-550px;width:1100px;text-align:right;z-index:10}
+.mainSlide .slideNum{-webkit-border-radius:20px;-moz-border-radius:20px;-ms-border-radius:20px;border-radius:20px;display:inline-block;vertical-align:middle;*display:inline;*zoom:1;background-color:rgba(255,255,255,.2);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#33FFFFFF, endColorstr=#33FFFFFF);height:16px;padding:4px 9px;z-index:6;line-height:1}
+:root .mainSlide .slideNum{filter:none}
+.mainSlide .slideNum i{-webkit-border-radius:50%;-moz-border-radius:50%;-ms-border-radius:50%;border-radius:50%;display:inline-block;vertical-align:middle;*display:inline;*zoom:1;margin:0 3px;width:10px;height:10px;font-size:0;line-height:0;cursor:pointer;background-color:#fff}
+.mainSlide .slideNum .cur{background-color:#fa4b9b}
+.mainSlide .leftAr:link,.mainSlide .rightAr:link{display:none;position:absolute;top:50%;width:33px;height:54px;margin-top:-27px;cursor:pointer;background:url(http://www.miyabaobei.com/resources/images/index_j_btn.png?v=20150203) no-repeat;z-index:4}
+.mainSlide .leftAr:link{left:0}
+.mainSlide .rightAr:link{right:0;background-position:right 0}
+.promSeciton{position:relative;margin-top:-97px;z-index:4}
+.mainSlide .arNav{position:absolute;top:0;left:50%;width:1100px;margin-left:-550px;z-index:4;height:100%}
+.mainSlide .arNav .w1004{position:relative;margin:0 auto;width:1100px;height:100%}
+.w1004{position:relative;margin:0 auto;width:1100px;height:100%}
+.mainSlide .cell .singlePd{width:415px;height:192px;padding:18px 20px 20px 20px;position:absolute;top:20px;right:0;background-color:rgba(255,255,255,.3);border-radius:3px}
+.mainSlide .cell .singlePd .tim{margin-bottom:15px;color:#666;font-size:14px}
+.mainSlide .cell .singlePd .tt{font-size:18px;font-family:'Microsoft Yahei';line-height:26px;color:#010101}
+.mainSlide .cell .singlePd .price{color:#f34fa1;font-size:32px;font-family:Arial;position:absolute;left:20px;bottom:12px}
+.mainSlide .cell .price .y{color:#f34fa1;font-size:32px}
+.mainSlide .cell .price .mp{color:#999;font-size:14px;text-decoration:line-through}
+.mainSlide .cell .price .mp .y{color:#999;font-size:14px;text-decoration:none}
+.mainSlide .cell .singlePd .num{color:#999;font-size:14px;font-family:Arial;position:absolute;right:20px;bottom:12px}
+.index-brand{margin:10px 0 0 240px;width:860px;height:105px;background:#fff}
+.index-brand>*{display:inline-block;vertical-align:middle;*display:inline;*zoom:1}
+.index-brand h3{padding:0 27px;zoom:1;font-size:14px;color:#444}
+.index-brand .brands img{margin:0 12px;width:94px}
+.index-brand i{width:1px;height:100%;zoom:1}
+.mod-col-3-3{margin:17px -20px 0 0;width:1120px}
+.mod-col-3-3>a{float:left;width:360px;height:168px;margin-right:10px;overflow:hidden;background-color:#f0f0f0}
+.mod-col-3-3>a img{width:100%;vertical-align:top}
+.mod-col-2-2{margin:10px -20px 0 0;width:1120px}
+.mod-col-2-2>a{float:left;width:545px;height:254px;margin-right:10px;overflow:hidden;background-color:#f0f0f0}
+.mod-col-2-2>a img{width:100%;vertical-align:top}
+.mod-h3{font-size:24px;color:#222}
+.mod-h3 span{margin-left:18px;vertical-align:-1px;font-weight:400;font-size:18px;color:#999}
+.mod-qhh,.mod-qqcm{margin-top:25px}
+.mod-qhh .layout>a,.mod-qqcm .layout>a{float:left;margin-right:-1px;width:219px;border:1px solid #e5e5e5;background-color:#fff;margin-top:-1px}
+.mod-qhh .layout>a:hover .tit,.mod-qqcm .layout>a:hover .tit{color:#fa4b9b}
+.mod-qhh .rim,.mod-qqcm .rim{position:relative;padding:15px}
+.mod-qhh .gds-img,.mod-qqcm .gds-img{position:relative}
+.mod-qhh .tit,.mod-qqcm .tit{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;color:#222;font-size:12px;font-weight:700}
+.mod-qhh .tit img,.mod-qqcm .tit img{margin-right:7px;vertical-align:-1px}
+.mod-qhh .tit.has-nodesc,.mod-qqcm .tit.has-nodesc{white-space:normal;position:relative;line-height:1.5em;height:3em;overflow:hidden}
+.mod-qhh .desc,.mod-qqcm .desc{font-size:12px;color:#555}
+.mod-qhh .price,.mod-qqcm .price{line-height:1.2;margin-top:8px}
+.mod-qhh .new,.mod-qqcm .new{font-size:14px}
+.mod-qhh .new em,.mod-qqcm .new em{font-size:20px}
+.mod-qhh .old,.mod-qqcm .old{font-size:12px}
+.mod-qhh .buy,.mod-qqcm .buy{font-size:12px;color:#666}
+.mod-qhh .btn,.mod-qqcm .btn{-webkit-border-radius:15px;-moz-border-radius:15px;-ms-border-radius:15px;border-radius:15px;position:absolute;right:15px;bottom:18px;padding:0 15px;height:28px;line-height:28px;background-color:#fa4b9b;font-size:12px;color:#fff}
+.mod-qqcm .rim{padding:15px 15px 10px 15px}
+.mod-qqcm .desc{margin-top:2px;color:#fa4b9b}
+.mod-qqcm .price span{display:block}
+.mod-qqcm .btn{bottom:12px}
+.mod-col-1-7{margin-top:25px}
+.mod-col-1-7 .layout>a{float:left;width:275px;height:170px;overflow:hidden}
+.mod-col-1-7 .layout>a img{width:100%}
+.mod-col-1-7 .layout>a.first{width:275px;height:340px}
+.mark-qfl{position:absolute;top:10px;left:8px;width:70px;height:30px;overflow:hidden;background:url(http://img.miyabaobei.com/d1/p3/2016/04/25/8e/f1/8ef13b2c0f24cc47f6078ae9c46a3a56.png) no-repeat;font-size:0;text-indent:-999em;color:#fd3e62;display:none}
+.index-outlet{margin-top:25px}
+.index-outlet .block{*zoom:1;margin-bottom:15px;padding:6px 0;border:1px solid #e5e5e5;background-color:#fff}
+.index-outlet .block:after,.index-outlet .block:before{content:"";display:table}
+.index-outlet .block:after{clear:both;overflow:hidden}
+.index-outlet .bigban{position:relative;float:left;margin-left:6px;width:750px;height:350px;overflow:hidden;background:#f0f0f0}
+.index-outlet .bigban i{position:absolute;top:14px;right:0;width:0;height:0;border-top:10px solid transparent;border-right:12px solid #fff;border-bottom:10px solid transparent}
+.index-outlet .rank{float:right;padding:0 18px;width:306px;height:350px;overflow:hidden}
+.index-outlet .rank>a{*zoom:1;display:block;margin-top:-1px;padding:18px 15px;border-top:1px dashed #c4c4c4;cursor:pointer}
+.index-outlet .rank>a:after,.index-outlet .rank>a:before{content:"";display:table}
+.index-outlet .rank>a:after{clear:both;overflow:hidden}
+.index-outlet .rank .l{position:relative;float:left;margin-right:12px;width:78px;height:78px;border:1px solid #efefef;overflow:hidden}
+.index-outlet .rank .l i{position:absolute;top:0;left:0;width:45px;height:18px;line-height:18px;background:url(http://img.miyabaobei.com/d1/p3/2016/04/20/e9/9f/e99fc1aca9854637d941aba2dc58c28c.png);font-size:11px;color:#fff;font-family:Verdana,Geneva,sans-serif}
+.index-outlet .rank .l i.r1{background-position:0 0}
+.index-outlet .rank .l i.r2{background-position:0 -20px}
+.index-outlet .rank .l i.r3{background-position:0 -40px}
+.index-outlet .rank .r{float:none;display:block;overflow:hidden;font-size:13px}
+.index-outlet .rank .tit{margin-top:5px;height:38px;overflow:hidden}
+.index-outlet .rank .price{margin-top:15px;line-height:1}
+.index-outlet .rank .price .new{margin-right:5px;font-size:14px}
+.index-outlet .rank .price .new em{font-size:18px}
+.index-outlet .rank .price .old{font-size:12px}
+/*备案信息*/
+/*备案信息*/
+.record{background: url(http://img.miyabaobei.com/d1/p3/2016/05/17/71/e0/71e0be0874270b883d358a16974a4d3c.jpg) no-repeat center center;height: 155px;width: 1100px;margin-bottom: 40px;font-size: 16px;text-align: center;color:#666;padding-top:35px; }
+.sideBar{z-index: 99;}
+.ad{display: inline-block;height:22px;line-height:22px;width: 40px;background: #e0e0e0;color:#fff;text-align: center;border-radius: 2px;font-size: 12px;position: absolute;bottom: -90px;left: 8px;}
