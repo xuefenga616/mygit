@@ -19,21 +19,22 @@ class spider():
         return li
     def getinfo(self,classinfo):
         info = {}
-        info['最后回复日期'] = re.findall('title="最后回复时间">(.*?)</span>',classinfo,re.S)
+        info['最后回复时间'] = re.findall('<span class="threadlist_reply_date pull_right j_reply_data" title="最后回复时间">(.*?)</span>',classinfo,re.S)
         info['回复人数'] = re.findall('title="回复">(.*?)</span>',classinfo,re.S)
         info['主题'] = re.findall('target="_blank" class="j_th_tit ">(.*?)</a>',classinfo,re.S)
         info['主题作者'] = re.findall('title="主题作者: (.*?)"',classinfo,re.S)
         info['内容'] = re.findall('threadlist_abs threadlist_abs_onlyline ">(.*?)</div>',classinfo,re.S)
+        info['最后回复人']=re.findall('<span class="tb_icon_author_rely j_replyer" title="最后回复人:(.*?)">', classinfo, re.S)
         return info
     def saveinfo(self,info):
         with open('D:\spider\infoTieba.txt','a') as f:
             for each in info:
                 try:
                     f.writelines('回复人数：' + ''.join(each['回复人数']) + '\n')
-                    f.writelines('最后回复日期：' + ''.join(each['最后回复日期']) + '\n')
+                    f.writelines('最后回复人：'+''.join(each['最后回复人']).encode('utf-8')+'\n')
                     f.writelines('主题：' + ''.join(each['主题']).encode('utf-8') + '\n')
                     f.writelines('主题作者：' + ''.join(each['主题作者']).encode('utf-8') + '\n')
-                    f.writelines('内容：' + ''.join(each['内容']).encode('utf-8') + '\n')
+                    f.writelines('内容：' + ''.join(each['内容']).encode('utf-8') + '\n\n')
                 except Exception,e:
                     print e
 
