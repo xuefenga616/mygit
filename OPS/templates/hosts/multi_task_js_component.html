@@ -1,0 +1,108 @@
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#group-list a[data='group']").click(function(){
+                $(this).nextAll("ul").toggleClass("hide");
+            });//end group-list
+            /*$("input[data='host-group']").change(function(){
+                console.log(this);
+            });*/
+        });
+
+        function CheckAllToggle(ele){
+            if(ele.checked){//把下面的主机都全选
+                $(ele).next().next().children().children("input").prop("checked", true);
+            }else{
+                $(ele).next().next().children().children("input").prop("checked", false);
+            }
+        }
+
+        function VerifyHostSelection(){ //找到选中的主机
+            var selected_hosts = [];
+            var all_hosts = $("input[data='bind-host']");
+            $.each(all_hosts, function(index,ele){
+                if(ele.checked){
+                    selected_hosts.push($(ele).val());
+                }
+            });//end each
+            return selected_hosts
+        }
+        function PrintOnPage(callback){
+            $("#result-box").html("");  //先清空
+            $.each(callback, function(index,item){
+                 var row_html = "<p>" + item.bind_host__host__hostname + "(" +
+                                 item.bind_host__host__ip_addr + ") ---->" +
+                                 item.bind_host__host_user__username + "---->" +
+                                 item.date + "---->" + item.result + "</p>" +
+                                 "<pre>" + item.event_log + "</pre>";
+                 $("#result-box").append(row_html);
+
+            });//end each
+        }
+        function GetTaskResult(task_id){
+            $.getJSON("{% url 'get_task_result' %}", {task_id:task_id}, function(callback){
+                console.log(callback);
+                PrintOnPage(callback);
+            });//end getJSON
+        }
+        function RefreshGetTaskResult(task_id){
+            GetTaskResult(task_id); //先调用一次
+            GetTaskResultInterval = setInterval(function(){
+                GetTaskResult(task_id);
+            },3000);    //每3秒数据库中取一次
+        }
+        function FormVerification(task_type){    //验证表单
+            var err_list = [];
+            var data_list = {}; //存储所有的用户选择的主机和其他参数
+            var selected_host = VerifyHostSelection();
+            data_list['selected_hosts'] = selected_host;
+            data_list['task_type'] = task_type;
+            if(selected_host.length == 0){
+                err_list.push(['验证失败','未选择任何主机！'])
+            }
+
+            if(task_type == 'multi_cmd'){
+                var cmd_text = $.trim($("textarea[name='cmd']").val());//$.trim()去空格
+                data_list['cmd'] = cmd_text;
+                if(cmd_text.length == 0){
+                    err_list.push(['验证失败','未输入要执行的命令！'])
+                }
+            }else if(task_type == 'multi_file_transfer'){
+                var remote_path_val = $.trim($("#remote_file_path").val());
+                data_list['remote_path'] = remote_path_val;
+                if(remote_path_val.length == 0){
+                    err_list.push(['验证失败','未输入远程路径！']);
+                }
+                //verify upload or download
+                var task_action = $("#task_type").val();
+                data_list['file_transfer_type'] = task_action;
+                if(task_action == 'file_send'){
+                    if(upload_files.length == 0){
+                        err_list.push(['验证失败','未上传任何文件到中转机！']);
+                    }
+                    data_list['upload_files'] = upload_files;
+                }
+
+            }
+
+            if(err_list.length > 0){
+                $("#err-msgs").html("");    //先清一下
+                $.each(err_list, function(index,item){
+                    var err_msg = "<p style='color:red'>" + index + ". " + item[1] + "</p>";
+                    $("#err-msgs").append(err_msg);
+                });
+            }else{  //提交任务
+                $("#err-msgs").html("");    //没错也清一下
+                data_list["csrfmiddlewaretoken"] = $("input[name='csrfmiddlewaretoken']").val();
+                $.post("{% url 'submit_task' %}", data_list, function(callback){
+                    console.log('---task res---')
+                    console.log(callback);
+                    task_id_obj = JSON.parse(callback);
+                    RefreshGetTaskResult(task_id_obj.task_id);
+                });//end post
+            }
+        }
+        function SubmitTask(task_type){
+            FormVerification(task_type);
+        }
+    </script>
