@@ -1,0 +1,116 @@
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#group-list a[data='group']").click(function(){
+            $(this).nextAll().toggleClass("hide");
+        });
+
+{#        $("input[data='host-group']").change(function(){#}
+{#            console.log($(this));#}
+{#        });#}
+    });//end ready
+
+    function CheckAllToggle(ele){
+        if(ele.checked){    //把它下面所有的主机全选
+            $(ele).next().next().children().children('input').prop("checked",true); //点击即选中
+        }else{
+            $(ele).next().next().children().children('input').prop("checked",false);
+        }
+    }
+
+    function SubmitTask(task_type){
+
+        FormVerification(task_type);    //验证表单
+    }
+    function FormVerification(task_type){
+        var err_list = [];
+        var data_list = {};
+        //至少选择一个主机，命令行不为空
+        var selected_hosts = VerifyHostSelection();  //验证主机有没选中
+        data_list['selected_hosts'] = selected_hosts;
+        if(selected_hosts.length == 0){ //没选中主机
+            err_list.push(['验证失败', "未选择任何主机!"])
+        }
+        data_list['task_type'] = task_type;     //三个参数：selected_hosts,cmd,task_type
+
+        if(task_type == 'multi_cmd'){
+
+            var cmd_text = $.trim($("textarea[name='cmd']").val()); //$.trim()是去掉空格
+            data_list['cmd'] = cmd_text;
+            //console.log("--cmd: " + cmd_text);
+
+            if(cmd_text.length == 0){
+                err_list.push(['验证失败', "未输入要执行的命令!"])
+            }
+
+        }else if(task_type == 'multi_file_transfer'){
+            var remote_path_val = $.trim($("#remote_file_path").val()); //$.trim是去掉空格
+            data_list['remote_path'] = remote_path_val;     //远程目标目录
+            if(remote_path_val.length == 0){
+                err_list.push(['验证失败', "未输入远程文件路径!"])
+            }
+
+            //verify upload or download
+            var  task_action = $("#task_type").val();
+            data_list['file_transfer_type'] = task_action;  //
+            if(task_action == 'file_send'){
+                if(upload_files.length == 0){
+                    err_list.push(['验证失败', "还未上传任何文件到中转机!"])
+                }
+
+                data_list['upload_files'] = upload_files;   //
+            }
+        }
+
+        if(err_list.length > 0){    //代表出错
+            $("#err-msgs").html("");
+            $.each(err_list,function(index,item){   //轮询处理错误项
+                var err_msg = "<p style='color:red;'>" + index + ". " + item[1] + "</p>";
+                    $("#err-msgs").append(err_msg);
+            });
+        }else{  //没出错，开始提交任务
+            $("#err-msgs").html("");
+
+            data_list["csrfmiddlewaretoken"] = $("input[name='csrfmiddlewaretoken']").val();    //把csrftoken值塞到data_list里
+            $.post("{% url 'submit_task' %}",data_list,function(callback){
+                console.log(callback);      //取到task_id，如{"task_id": 2}
+                task_id_obj = JSON.parse(callback);
+                RefreshGetTaskResult(task_id_obj.task_id);  //根据task_id去取结果
+            });
+        }
+    }
+
+    function RefreshGetTaskResult(task_id){
+        GetTaskResult(task_id);
+        GetTaskResultInterval = setInterval(function(){     //每3秒取一次结果
+            GetTaskResult(task_id);
+        },3000);
+    }
+    function GetTaskResult(task_id){
+        $.getJSON("{% url 'get_task_result' %}",{task_id:task_id},function(callback){
+            console.log(callback);
+            PrintOnPage(callback);  //把结果显示到页面
+        });//getJSON返回的就是解析好了的
+    }
+    function PrintOnPage(callback){
+        $("#result-box").html("");
+        $.each(callback,function(index,item){   //循环结果
+            var row_html = "<p>" + item.bind_host__host__hostname + "(" + item.bind_host__host__ip_addr + ") ----> " + item.bind_host__host_user__username + " ---- " + item.date + " ---- " + item.result + "</p>" +
+                            "<pre>" + item.event_log + "</pre>";    //pre是保留html的原格式
+            $("#result-box").append(row_html);
+        });
+    }
+
+    function VerifyHostSelection(){
+        var selected_hosts = []
+        var all_hosts = $("input[data='bind-host']");
+        //console.log(all_hosts)
+        $.each(all_hosts,function(index,ele){   //开始循环all_hosts列表
+            //console.log(ele.checked);   //检查是否选中
+            if(ele.checked){
+                selected_hosts.push($(ele).val());
+            }
+        });
+        return selected_hosts   //返回选中主机的id
+    }
+    </script>
