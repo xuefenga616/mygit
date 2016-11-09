@@ -1,0 +1,333 @@
+{% extends 'index.html' %}
+
+{% block page-title %}
+批量命令
+{% endblock %}
+
+
+{% block page-content %}
+{% csrf_token %}
+<div class="row">
+    <div class="col-sm-7 col-lg-3 host-list-div" >
+         <div class="panel" style="padding:0 20px 80px 20px" >
+            <div class="pannel-heading">
+                <h3 class="panel-title">主机组 <span class="label label-info">已选: <b id="total-chosen-hosts">0</b>台</span></h3>
+                <span id="unfold-all" class="label label-success">展开</span>
+                <span id="collapse-all" class="label label-success">收缩</span>
+                <span id="show-all-checked" class="label label-success">已选</span>
+                <span id="show-all-unchecked" class="label label-success">未选</span>
+                <span id="check-all" class="label label-success">全选</span>
+                <span id="uncheck-all" class="label label-success">取消全选</span>
+
+
+            </div>
+            <div class="pannel-body">
+                <div class="searchbox">
+                    <div class="input-group custom-search-form">
+                        <input type="text" id="search-host" class="form-control" placeholder="搜索主机..">
+                        <span class="input-group-btn">
+                            <button class="text-muted" type="button"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div>
+                </div>
+                {#% for g_id,data in host_groups.items %#}
+                <!--未分类主机-->
+                    <div class="" style="padding-top:5px;padding-bottom:0px;">
+
+                        <!--Block level checkboxes-->
+                        <!--===================================================-->
+                        <form  class="form-block host-list">
+                            <ul class="list-group">
+                                <li style="border:0px;padding:0px" class="list-group-item">
+                                    <span class="badge badge-primary"><i class="fa fa-chevron-down " id="group_toggle_-2" onclick="ToggleGroup(-2)"></i></span>
+                                    <span data_label="group" class="badge badge-primary">全选</span>
+                                    <b>未分类主机 [{{  request.user.userprofile.bind_hosts.select_related.count }}]</b>
+                                </li>
+
+                            </ul>
+
+                            {% for h in  request.user.userprofile.bind_hosts.select_related %}
+                                <label input_label='host' style='display:none'  class="form-checkbox form-normal form-primary form-text active">
+                                    <input type="checkbox" id="host_{{ h.id }}" >{{ h.host.hostname }}({{ h.host.ip_addr }}) @ {{ h.host_user.username }}
+                                </label>
+                            {% endfor %}
+
+
+                        </form>
+                        <!--===================================================-->
+
+                    </div>
+                    <hr style="margin:0px">
+
+                <!--end未分类主机-->
+
+                {% for g in request.user.userprofile.host_groups.select_related  %}
+                    <div class="" style="padding-top:5px;pdding-bottom:0px;">
+                        <form  class="form-block host-list">
+                            <ul class="list-group">
+                                <li style="border:0px;padding:0px" class="list-group-item">
+                                    <span class="badge badge-primary"><i class="fa fa-chevron-down " id="group_toggle_{{ g.id }}" onclick="ToggleGroup({{ g.id }})"></i></span>
+                                    <span data_label="group" class="badge badge-primary">全选</span>
+                                    <b>{{ g.name }} [{{  g.bindhosts_set.select_related.count}}]</b>
+                                </li>
+
+                            </ul>
+
+                            {% for h in  g.bindhosts_set.select_related %}
+                                <label input_label='host' style='display:none'  class="form-checkbox form-normal form-primary form-text active">
+                                    <input type="checkbox" id="host_{{ h.id }}" >{{ h.host.hostname }}({{ h.host.ip_addr }}) @ {{ h.host_user.username }}
+                                </label>
+                            {% endfor %}
+                        </form>
+                    </div>
+                    <hr style="margin:0px">
+                {% endfor %}
+            </div>
+         </div>
+    </div>
+
+
+    <div class="col-sm-7 col-lg-9 pull-right task-res-div">
+        <div class="panel">
+            <div class="pannel-heading">
+                <div class="panel-control">
+                    <button class="btn btn-default " type="button" data-toggle="collapse" data-target="#demo-chat-body" aria-expanded="true">
+                        <i class="fa fa-chevron-down "></i>
+                    </button>
+                </div>
+                <h3 class="panel-title">{% block multi_task_action_title %}批量命令执行{% endblock %}</h3>
+            </div>
+
+            <div class="panel-body">
+                <textarea type="text" style="font-size:15px" placeholder="输入要执行的命令..." id="cmd" class="form-control"></textarea>
+                <div class="pad-ver">
+                    <select name="task-expire-time" class="btn-info">
+                        <option value="30">任务超时时间(30分钟)</option>
+                        <option value="45">45分钟</option>
+                        <option value="60">60分钟</option>
+                        <option value="90">90分钟</option>
+                        <option value="120">120分钟</option>
+                        <option value="180">180分钟</option>
+                    </select>
+
+                    <button id="task-exec-btn" type="button" class="btn btn-success btn-labeled">
+                        <span class="btn-label"><i class="fa fa-bicycle"></i></span> 执行命令
+                    </button>
+
+                    <button onclick="TerminateTask()" id="mail-save-btn" type="button" class="btn btn-danger btn-labeled">
+                        <span class="btn-label"><i class="fa fa-stop"></i></span> 停止
+                    </button>
+                </div>
+                <br>
+
+                <div class="row"> <!--result-->
+                    <div class="pad-ver task-summary-panel">
+
+                        <span  id="current-task-id" style="font-size:15px;background-color:gray" class="badge badge-primary">任务ID:<span></span></span>
+                        <span id="total-tasks"  style="font-size:15px;" class="badge badge-primary">总任务<span>n/a</span></span>
+                        <span id="finished-tasks" style="font-size:15px;" class="badge badge-success">已完成<span>n/a</span></span>
+                        <span id="failed-tasks"  style="font-size:15px;" class="badge badge-danger">失败<span>n/a</span></span>
+                        <span id="unkown-tasks" style="font-size:15px;" class="badge badge-warning">剩余<span>n/a</span></span>
+                        <span onclick="task_detail_toggle('chosen',this)" style="font-size:15px;background-color:gray" class="badge badge-primary"><i class="fa fa-chevron-circle-down"></i> 收缩/展开</span>
+
+                        <div id="alert-panel" ></div>
+                    </div>
+                    <div class="task-result">
+
+                    </div>
+                </div> <!--result-->
+
+            </div>
+        </div>
+    </div>
+
+</div> <!--end row-->
+
+<!-- Modal -<模态对话框-->
+<div class="modal fade" id="taskRunConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">任务执行确认</h4>
+      </div>
+      <div class="modal-body">
+        <span id="modal-content">确定要执行么？</span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" id="submit-task-confirm" onclick="submit_task(this,'/api/multitask/cmd/')" class="btn btn-primary">确定执行</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--end 模态对话框-->
+
+{% endblock %}
+
+{% block bottom-js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("span[data_label='group']").click(function(){
+            var btn_val = $(this).html();
+            if(btn_val == '全选'){
+                var hosts = $(this).parent().parent().nextAll().addClass("active");
+                $(this).html('取消');
+            }else{
+                var hosts = $(this).parent().parent().nextAll().removeClass("active");
+                $(this).html('全选');
+            }
+
+            TotalChosenHosts();
+        });//end click data_label='group'
+
+        $("#task-exec-btn").click(function(){
+            var cmd = $.trim($("#cmd").val()); //$.trim()是去掉空格
+            var task_expire_time = $("select[name='task-expire-time']").val()
+
+            postDic = {
+                'selected_hosts': [],
+                'expire_time': task_expire_time,
+                'cmd': cmd
+            }
+            var err_msg = [];
+
+            var selected_hosts = $("label[input_label='host']").filter(".active");
+            if(selected_hosts.length == 0){
+                err_msg.push("未选择任何主机执行任务!")
+            }
+            if(cmd.length == 0){
+                err_msg.push("输入的命令不能为空!")
+            }
+            $(selected_hosts).children().each(function(){
+                //console.log($(this).attr('id'));    //打印：如host_1
+                postDic['selected_hosts'].push($(this).attr('id'));
+            })
+            postDic['selected_hosts'] = JSON.stringify(postDic['selected_hosts']);  //类似dumps
+
+            if(err_msg == 0){
+                //该输入的都输入了，开始跑任务
+                $("#taskRunConfirmModal").modal('show');    //弹出是否执行的对话框
+            }else{
+                console.log(err_msg + err_msg.length);
+                show_alert_info(err_msg);
+            }
+        })//end click 执行命令
+    });//end document
+
+    function show_alert_info(msg_list){
+        var err_msg = "";
+        for (msg_index in msg_list){
+            err_msg += msg_index + ". " + msg_list[msg_index] + "<br/>";
+        }
+
+        $.niftyNoty({
+            type: 'info',
+            container : '#alert-panel',
+            html : '<h4 class="alert-title">Message</h4>' +
+            '<p class="alert-message">'+  err_msg +  '</p>' +
+            '<div class="mar-top">' +
+                '<button type="button" class="btn btn-info" data-dismiss="noty">知道了</button>' +
+            '</div>',
+            closeBtn : false
+        });
+    }
+
+    function TotalChosenHosts(){
+        //取：选择的主机数量
+        var total_chosen_hosts = $(".host-list label").filter(".active").length;
+        $("#total-chosen-hosts").html(total_chosen_hosts);
+    }
+
+    function ToggleGroup(g_id){     //展开主机列表
+        var group_ele = $("#group_toggle_" + g_id);
+        var all_host_eles = group_ele.parent().parent().parent();
+        all_host_eles.nextAll().fadeToggle(300);
+    }
+
+    function submit_task(ele,post_url){
+        //console.log(ele);
+        $(ele).attr('disabled','true'); //第一个参数：规定属性的名称，第二个参数：规定属性的值
+        $.post(post_url,postDic,function(callback){
+            console.log(callback);
+            if(callback != 'TaskCreatingError'){
+                $("#modal-content").html("任务创建成功! 任务编号: " + callback);
+                $("#modal-content").attr("style","color:green;font:bold");
+                $(".task-result").html("");
+                /////////////////////下载文件
+                GetTaskResult(callback,'refresh');
+            }else{
+                $("#modal-content").html("任务创建失败，请查看相关日志进行调试!");
+                $("#modal-content").attr("style","color:red;font:bold")
+            }
+        });
+    }
+
+    function GetTaskResult(task_id,run_type){
+        if(run_type == 'refresh'){
+            PrintTaskResult(task_id);
+            ResultRefresh = setInterval(function(){
+                PrintTaskResult(task_id);
+            },3000);    //3秒刷新一次显示结果
+        }else{
+            ///////////////
+        }
+    }
+
+    function PrintTaskResult(task_id){
+        $.getJSON('/api/multitask/res/',{'task_id':task_id},function(logdata){
+            $("#current-task-id span").html(logdata['summary'].id);
+            $("#total-tasks span").html(logdata['summary'].host_num);
+            $("#finished-tasks span").html(logdata['summary'].finished_num);
+            $("#failed-tasks span").html(logdata['summary'].failed_num);
+            $("#unkown-tasks span").html(logdata['summary'].unknown_num);
+            console.log(logdata['summary']);
+
+            $.each(logdata['detail'],function(key,log){
+                //console.log(logdata['detail'][key]);
+                var d = logdata['detail'][key];
+                if(d.result == 'success'){
+                    var task_res = '<span class="task_res_status badge badge-success">' + d.result + '</span>';
+                }else if(d.result == 'failed'){
+                    var task_res = '<span class="task_res_status badge badge-danger">' + d.result + '</span>';
+                }else{
+                    var task_res = '<span class="task_res_status badge badge-warning">' + d.result + '</span>';
+                }
+
+                if ($(".task-result div[result='host_" + d.host_id + "'] pre").attr("style")=="display: none;"){
+                    var res_detail = "<pre style='display: none;'>" + d.event_log + "</pre>";
+                }else{
+                    var res_detail = "<pre style='display: block;'>" + d.event_log + "</pre>";
+
+                }
+                if ($(".task-result div[result='host_" + d.host_id + "'] h4").attr("style")=="display: none;"){
+                     var h4_ele = "<b style='display: none;'>";
+                }else{
+                     var h4_ele = "<b style='display: block;'>";
+
+                }
+
+                var host_info_ele = h4_ele + "<i onclick='ToggleSingleResult(this)'  class='fa fa-plus-square-o fa-plus-task-res'></i> " + d.hostname + "(" + d.ip_addr + ") user:" +
+                        d.username + " --- System: " + d.system + " --- Result: " + task_res +
+                        "</b>" + res_detail;
+
+                if ($(".task-result div[result='host_" + d.host_id + "']").length > 0) {
+                    $(".task-result div[result='host_" + d.host_id + "']").html(host_info_ele);
+                } else {
+                    var res_div = "<div result='host_" + d.host_id + "' class='host-res-head'>" + host_info_ele + "</div>";
+                    $(".task-result").append(res_div);
+                }
+            });//end each
+
+            if(logdata['summary'].unknown_num == 0){ //任务执行完了
+                if(typeof ResultRefresh != 'undefined'){
+                    clearInterval(ResultRefresh); //停止任务
+                    $("#submit-task-confirm").prop("disabled",false);   //同.attr(key,value)
+                }
+                $("button[onclick='submit_task(this)']").attr("disabled",false);
+            }
+
+        });//end getJSON
+    }
+</script>
+{% endblock %}

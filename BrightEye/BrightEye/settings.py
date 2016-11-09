@@ -111,3 +111,22 @@ STATICFILES_DIRS = (
 )
 
 LOGIN_URL = '/login/'
+
+MaxTaskProcesses = 2
+MultiTaskScript = '%s/%s'%(BASE_DIR,'backend/multitask.py')
+
+RSA_PRIVATE_KEY_FILE = '%s/%s'%(BASE_DIR,'var/rsa_key/id_rsa')
+
+Welcome_msg = '''
+|-------\033[32;1m[Welcome login BrightEye Auditing System]\033[0m-----|
+|            Version :   1.0                         |
+|            Author  :   DarkAlex                    |
+|            Email   :   xuefeng16@huawei.com        |
+|----------------------------------------------------|\n\n'''
+
+SHELLINABOX = {
+    'host':'192.168.1.12',
+    'port':4200,
+    'username':'xuefeng',
+    'password': '123456'
+}

@@ -30,12 +30,16 @@ class AuditLogAdmin(admin.ModelAdmin):
     search_fields = ['user__user__username','host__host__hostname','host__host__ip_addr','cmd']
 
 class TaskLogAdmin(admin.ModelAdmin):
-    list_display = ('id','start_time','end_time','task_type','user','cmd',)
+    list_display = ('id','start_time','end_time','task_type','user','cmd','expire_time',)
     list_filter = ('task_type','user','start_time')
 
 class TaskLogDetailAdmin(admin.ModelAdmin):
     list_display = ('child_of_task','bind_host','result','date')
     list_filter = ('child_of_task','result','date')
+
+class TokenAdmin(admin.ModelAdmin):
+    list_display = ('user','host','token','date','expire')
+    readonly_fields = models.Token._meta.get_all_field_names()  #不可修改
 
 
 admin.site.register(models.Hosts,HostAdmin)
@@ -46,6 +50,7 @@ admin.site.register(models.UserProfile,UserProfileAdmin)
 admin.site.register(models.AuditLog,AuditLogAdmin)
 admin.site.register(models.TaskLog,TaskLogAdmin)
 admin.site.register(models.TaskLogDetail,TaskLogDetailAdmin)
+admin.site.register(models.Token,TokenAdmin)
 admin.site.register(models.IDC)
 admin.site.register(models.Department)
 

@@ -4,6 +4,7 @@ from django.db import models
 # Create your models here.
 from django.contrib.auth.models import User
 import datetime
+from django.utils import timezone
 
 class IDC(models.Model):
     name = models.CharField(max_length=64,unique=True)
@@ -121,6 +122,7 @@ class TaskLog(models.Model):
     user = models.ForeignKey('UserProfile')
     hosts = models.ManyToManyField('BindHosts')
     cmd = models.TextField()
+    expire_time = models.IntegerField(default=30)
     task_pid = models.IntegerField(default=0)
     note = models.CharField(max_length=128,blank=True,null=True)
     def __unicode__(self):
@@ -147,3 +149,11 @@ class TaskLogDetail(models.Model):
         verbose_name = u'批量任务日志'
         verbose_name_plural = u'批量任务日志'
 
+class Token(models.Model):  #防止重复提交
+    user = models.ForeignKey(UserProfile)
+    host = models.ForeignKey(BindHosts)
+    token = models.CharField(max_length=64)
+    date = models.DateTimeField(default=timezone.now)
+    expire = models.IntegerField(default=300)
+    def __unicode__(self):
+        return '%s: %s' %(self.host.host.ip_addr,self.token)
