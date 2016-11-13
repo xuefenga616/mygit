@@ -24,6 +24,8 @@ urlpatterns = [
     url(r'^login/$', views.acc_login,name='login'),
     url(r'^logout/$', views.acc_logout,name='logout'),
     url(r'^hosts/$', views.hosts,name='host_list'),
-    url(r'^hosts_multi/$', views.hosts_multi,name='hosts_multi'),
+    url(r'^hosts/multi/$', views.hosts_multi,name='hosts_multi'),
+    url(r'^hosts/multi_filetrans/$', views.hosts_multi_filetrans,name='hosts_multi_filetrans'),
+    url(r'^hosts/crontab/$', views.hosts_crontab,name='hosts_crontab'),
     url(r'^api/', include(api_urls)),
 ]

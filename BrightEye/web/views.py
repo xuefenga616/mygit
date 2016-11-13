@@ -10,6 +10,8 @@ import json,datetime
 from BrightEye import settings
 from django.core.exceptions import ObjectDoesNotExist
 import host_mgr
+import utils
+import os
 
 @login_required
 def dashboard(request):
@@ -51,7 +53,7 @@ def hosts(request):
 @login_required
 def hosts_multi(request):
     return render(request,'hosts_multi.html',{'login_user':request.user,
-                                              })
+                                              'active_node':'/hosts/multi'})
 @login_required
 def multitask_cmd(request):
     print request.POST
@@ -67,3 +69,40 @@ def multitask_res(request):
     multi_task = host_mgr.MultiTask('get_task_result',request)
     task_result = multi_task.run()
     return HttpResponse(task_result)
+
+@login_required
+def hosts_multi_filetrans(request):
+    return render(request,'hosts_multi_files.html',{'login_user':request.user,
+                                                    'active_node':'/hosts/multi_filetrans'})
+
+@login_required
+@csrf_exempt
+def multitask_file_upload(request):
+    filename = request.FILES['filename']
+    print '-->',request.POST
+    file_path = utils.handle_upload_file(request,filename)
+
+    return HttpResponse(json.dumps({'uploaded_file_path':file_path,
+                                    'text':'success'}))
+
+@login_required
+def file_download(request,task_id): #下载文件到我的电脑
+    file_path = "%s\\%s\\%s\\%s" %(settings.BASE_DIR,settings.FileUploadDir,request.user.userprofile.id,task_id)
+
+    return utils.send_tmpfile(request,task_id,file_path)
+
+@login_required
+def multitask_file(request):
+    print 'multitask_file',request.POST
+    multi_task = host_mgr.MultiTask(request.POST.get('task_type'),request)
+    task_id = multi_task.run()
+    return HttpResponse(task_id)
+
+@login_required
+def hosts_crontab(request):
+    return render(request,'crontab.html',{'active_node':'/hosts/crontab'})
+
+@login_required
+def create_bigtask(request):
+    if request.method == "POST":
+        return HttpResponse('successfully create bigtask!')

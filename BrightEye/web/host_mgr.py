@@ -35,6 +35,41 @@ class MultiTask(object):
 
         return task_obj.id
 
+    def file_get(self):     #下载文件
+        return self.file_send()
+
+    def file_send(self):
+        params = json.loads(self.request.POST.get('params'))
+        host_ids = [int(i.split('host_')[-1]) for i in params.get('selected_hosts')]
+        expire_time = params.get('expire_time')
+        exec_hosts = models.BindHosts.objects.filter(id__in=host_ids)   #从数据库中取出要执行任务的主机
+        task_type = self.request.POST.get('task_type')
+        local_file_list = params.get('local_file_list')
+        remote_file_path = params.get('remote_file_path')
+        if task_type == 'file_send':
+            content = "send local files %s to remote path [%s]" %(local_file_list,params.get('remote_file_path'))
+        else:
+            local_file_list = 'not_required'    #防止混乱出错
+            content = 'download remote file [%s]' %params.get('remote_file_path')
+
+        task_obj = self.create_task_log(task_type,exec_hosts,expire_time,content)
+        if task_type == 'file_get':
+            local_path = "%s\\%s\\%s\\%s" %(settings.BASE_DIR,settings.FileUploadDir,self.request.user.userprofile.id,task_obj.id)
+            if not os.path.isdir(local_path):
+                os.mkdir(local_path)
+
+        p = subprocess.Popen(['python',
+                              settings.MultiTaskScript,
+                              '-task_type',task_type,
+                              '-expire',expire_time,
+                              '-uid',str(self.request.user.userprofile.id),
+                              '-local',' '.join(local_file_list),
+                              '-remote',remote_file_path,
+                              '-task_id',str(task_obj.id)])
+
+        task_obj.save()
+        return task_obj.id
+
     @transaction.atomic     #函数从头执行到尾不中断
     def create_task_log(self,task_type,hosts,expire_time,content,note=None):
         task_log_obj = models.TaskLog(

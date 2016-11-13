@@ -117,6 +117,8 @@ MultiTaskScript = '%s/%s'%(BASE_DIR,'backend/multitask.py')
 
 RSA_PRIVATE_KEY_FILE = '%s/%s'%(BASE_DIR,'var/rsa_key/id_rsa')
 
+FileUploadDir = 'uploads'
+
 Welcome_msg = '''
 |-------\033[32;1m[Welcome login BrightEye Auditing System]\033[0m-----|
 |            Version :   1.0                         |
