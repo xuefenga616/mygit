@@ -87,7 +87,7 @@ def multitask_file_upload(request):
 
 @login_required
 def file_download(request,task_id): #下载文件到我的电脑
-    file_path = "%s\\%s\\%s\\%s" %(settings.BASE_DIR,settings.FileUploadDir,request.user.userprofile.id,task_id)
+    file_path = "%s\\%s\\%s" %(settings.BASE_DIR,settings.FileUploadDir,request.user.userprofile.id)
 
     return utils.send_tmpfile(request,task_id,file_path)
 
@@ -103,6 +103,8 @@ def hosts_crontab(request):
     return render(request,'crontab.html',{'active_node':'/hosts/crontab'})
 
 @login_required
-def create_bigtask(request):
-    if request.method == "POST":
-        return HttpResponse('successfully create bigtask!')
+def multitask_bigtask(request):
+    print 'multitask_bigtask',request.POST
+    multi_task = host_mgr.MultiTask(request.POST.get('task_type'),request)
+    task_id = multi_task.run()
+    return HttpResponse(task_id)

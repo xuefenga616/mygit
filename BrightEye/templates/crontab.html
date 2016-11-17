@@ -83,8 +83,6 @@
                     <hr style="margin:0px">
                 {% endfor %}
 
-                <br>
-                <input id="file-upload" name="filename" type="file" multiple class="file-loading">
             </div>
          </div>
     </div>
@@ -99,27 +97,35 @@
             <div class="panel-body">
                 <div class="pad-ver">
 
-                    <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{% url 'create_bigtask' %}">{% csrf_token %}
+                    <form class="form-horizontal" >
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <input type="text" class="form-control" name="title" placeholder="请输入任务名称...">
                             </div>
                         </div>
-{#                        <div class="form-group">#}
-{#                            <label class="col-sm-1 control-label">简介</label>#}
-{#                            <div class="col-sm-11">#}
-{#                                <textarea class="form-control" rows="3" name="summary"></textarea>#}
-{#                            </div>#}
-{#                        </div>#}
                         <div class="form-group">
                             <div class="col-sm-12">
-                                <textarea id="edit-conf" name="content" style="height: 500px"></textarea>
+                                <input id="file-upload" name="filename" type="file" multiple class="file-loading">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-info btn-labeled">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <textarea type="text" style="font-size:15px" placeholder="输入要执行的命令..." id="cmd" class="form-control"></textarea>
+                            </div>
+                        </div>
+
+                        <select name="task-expire-time" class="btn-info">
+                            <option value="30">任务超时时间(30分钟)</option>
+                            <option value="45">45分钟</option>
+                            <option value="60">60分钟</option>
+                            <option value="90">90分钟</option>
+                            <option value="120">120分钟</option>
+                            <option value="180">180分钟</option>
+                        </select>
+                        <button id="bigtask-exec-btn" type="button" class="btn btn-success btn-labeled">
                             <span class="btn-label"><i class="fa fa-download"></i></span> 保存任务
                         </button>
-                        <button id="file-exec-btn" type="button" class="btn btn-success btn-labeled">
+                        <button type="submit" class="btn btn-info btn-labeled">
                             <span class="btn-label"><i class="fa fa-bicycle"></i></span> 开始执行
                         </button>
                         <!--Save draft button-->
@@ -168,14 +174,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">任务执行确认</h4>
+        <h4 class="modal-title" id="myModalLabel">任务保存确认</h4>
       </div>
       <div class="modal-body">
-        <span id="modal-content">确定要执行么？</span>
+        <span id="modal-content">确定要保存么？</span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-        <button type="button" id="submit-task-confirm" onclick="submit_task(this,'/api/multitask/file/')" class="btn btn-primary">确定执行</button>
+        <button type="button" id="submit-task-confirm" onclick="submit_task(this,'/api/multitask/bigtask/')" class="btn btn-primary">确定执行</button>
       </div>
     </div>
   </div>
@@ -239,15 +245,7 @@
                 console.log(response);
                 upload_files.push(response.uploaded_file_path);
         });
-        $("#task-type").on("change",function(){ //分成两个：一个上传、一个下载
-            if(this.value == 'file_send'){
-                $(".file-input").removeClass("hide");
-                $("#file-download-to-local").addClass("hide");
-            }else{
-                $(".file-input").addClass("hide");
-                $("#file-download-to-local").removeClass("hide");
-            }
-        });
+
         $("#file-download-to-local").click(function(){
             var task_id = $(this).attr('task_id');
             console.log('==task_id:' + task_id);
@@ -276,7 +274,7 @@
             $("#fileDownloadConfirm").modal("show");
         });//end file-download-to-local
 
-        $('#file-exec-btn').click(function(){   //执行文件上传下载任务
+        $('#bigtask-exec-btn').click(function(){   //执行大任务
             var expire_time = $("select[name='task-expire-time']").val();
             var remote_file_path = $("#remote-file-path").val();
 
@@ -285,7 +283,7 @@
                 'expire_time': expire_time,
             }
             var err_msg_list = [];
-            var task_type = $("#task-type").val();
+            var task_type = "bigtask";
 
             var selected_hosts = $("label[input_label='host']").filter(".active");
 
@@ -296,23 +294,11 @@
                 params["selected_hosts"].push($(this).attr("id"));
             });
 
-            if(task_type == 'file_send'){
-                if(upload_files.length == 0){
-                    err_msg_list.push("还未上传任何文件到中转机!");
-                }
-                if(remote_file_path.trim().length == 0){
-                    err_msg_list.push("未指定要分发到远程的文件路径!")
-                }
-                params['remote_file_path'] = remote_file_path;
-                params['local_file_list'] = upload_files;
-            }else{
-                /////////////////////下载文件
-                if(remote_file_path.trim().length == 0){
-                    err_msg_list.push("未指定要从远程下载的文件绝对路径名!");
-                }
-                params['remote_file_path'] = remote_file_path;
+            if(upload_files.length == 0){
+                err_msg_list.push("还未上传任何文件到中转机!");
             }
-
+            params['remote_file_path'] = "/tmp";
+            params['local_file_list'] = upload_files;
 
             if(err_msg_list.length > 0){
                 show_alert_info(err_msg_list);
@@ -366,7 +352,7 @@
                 $(".task-result").html("");
                 /////////////////////
                 $("#file-download-to-local").attr("task_id",callback); //默认task_id=None，这里修改为此次任务id
-                GetTaskResult(callback,'refresh');
+                //GetTaskResult(callback,'refresh');
             }else{
                 $("#modal-content").html("任务创建失败，请查看相关日志进行调试!");
                 $("#modal-content").attr("style","color:red;font:bold")
@@ -437,6 +423,7 @@
                 }
                 $("button[onclick='submit_task(this)']").attr("disabled",false);
             }
+
 
         });//end getJSON
     }

@@ -114,6 +114,7 @@ LOGIN_URL = '/login/'
 
 MaxTaskProcesses = 2
 MultiTaskScript = '%s/%s'%(BASE_DIR,'backend/multitask.py')
+GigTaskScript = '%s/%s'%(BASE_DIR,'backend/bigtask.py')
 
 RSA_PRIVATE_KEY_FILE = '%s/%s'%(BASE_DIR,'var/rsa_key/id_rsa')
 

@@ -45,13 +45,13 @@ def cmd_exec(task_id,bind_host_id,user_id,cmd):
         cmd_result = e
         res_status = 'failed'
     #修改数据库中已有任务状态
-    log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
-    log_obj.event_log = cmd_result
-    log_obj.result = res_status
-    log_obj.save()
+    # log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
+    # log_obj.event_log = cmd_result
+    # log_obj.result = res_status
+    # log_obj.save()
 
 def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
-    print '-->',task_id,bind_host_id,user_id,content
+    #print '-->',task_id,bind_host_id,user_id,content
     task_type = content[content.index('-task_type') + 1]
     remote_path = content[content.index('-remote') + 1]
     bind_host = models.BindHosts.objects.get(id=bind_host_id)
@@ -76,22 +76,24 @@ def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
                 #print remote_file_path
                 sftp.put(filename,remote_file_path)
             cmd_result += "successfully send file %s to remote path [%s]" %(local_file_list,remote_path)
+
         elif task_type == 'file_get':
             local_path = '%s\\%s\\%s' %(settings.BASE_DIR,settings.FileUploadDir,user_id)
             remote_filename = remote_path.split('/')[-1]
             remote_filename_dl = '%s_%s' %(remote_filename,bind_host.host.ip_addr)
-            print '--->',remote_filename_dl
+            #print '--->',remote_filename_dl
             sftp.get(remote_path, '%s/%s' %(local_path,remote_filename_dl))
             cmd_result ='download remote file [%s] is completed!' % remote_path
         res_status = 'success'
+        t.close()
     except Exception,e:
         print e
         cmd_result = e
         res_status = 'failed'
-    log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
-    log_obj.event_log = cmd_result
-    log_obj.result = res_status
-    log_obj.save()
+    # log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
+    # log_obj.event_log = cmd_result
+    # log_obj.result = res_status
+    # log_obj.save()
 
 if __name__ == '__main__':
     require_args = ['-task_type','-task_id','-expire','-uid']
@@ -139,3 +141,7 @@ if __name__ == '__main__':
 
     Pool.close()
     Pool.join()
+    # for h in task_obj.hosts.select_related():
+    #     task_func(task_id,h.id,uid,content)
+
+    #NE93259839042

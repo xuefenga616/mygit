@@ -116,7 +116,8 @@ class TaskLog(models.Model):
     task_type_choices = (
         ('cmd',"CMD"),
         ('file_send',u'批量发送文件'),
-        ('file_get',u'批量下载文件')
+        ('file_get',u'批量下载文件'),
+        ('bigtask',u'计划任务')
     )
     task_type = models.CharField(choices=task_type_choices,max_length=64)
     user = models.ForeignKey('UserProfile')

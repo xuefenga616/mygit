@@ -1,0 +1,10 @@
+cmd:
+  sh /tmp/install-mysql.sh 
+file_get:
+  - ip_addr: 192.168.1.11
+  - filename: /tmp/my.cnf
+file_send:
+  - ip_addr: 192.168.1.12
+  - filename: /tmp/my.cnf
+cmd2:
+  sh /tmp/start-mysql.sh  
