@@ -99,18 +99,20 @@
 
                     <form class="form-horizontal" >
                         <div class="form-group">
-                            <div class="col-sm-12">
+                            <label class="col-sm-1 control-label">名称</label>
+                            <div class="col-sm-11">
                                 <input type="text" class="form-control" name="title" placeholder="请输入任务名称...">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">简介</label>
+                            <div class="col-sm-11">
+                                <textarea type="text" class="form-control" rows="3" name="summary" placeholder="任务简介："></textarea>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <input id="file-upload" name="filename" type="file" multiple class="file-loading">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <textarea type="text" style="font-size:15px" placeholder="输入要执行的命令..." id="cmd" class="form-control"></textarea>
                             </div>
                         </div>
 
@@ -352,7 +354,7 @@
                 $(".task-result").html("");
                 /////////////////////
                 $("#file-download-to-local").attr("task_id",callback); //默认task_id=None，这里修改为此次任务id
-                //GetTaskResult(callback,'refresh');
+                GetTaskResult(callback,'refresh');
             }else{
                 $("#modal-content").html("任务创建失败，请查看相关日志进行调试!");
                 $("#modal-content").attr("style","color:red;font:bold")

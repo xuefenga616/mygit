@@ -9,10 +9,10 @@ import django   #脚本导入django方法
 django.setup()
 from web import models
 from django.db import connection
-import sys,time,os
+import sys,time,os,re
 import multiprocessing
 
-def cmd_exec(task_id,bind_host_id,user_id,cmd):
+def cmd_paramiko(bind_host_id,cmd):
     bind_host = models.BindHosts.objects.get(id=bind_host_id)
     s = paramiko.SSHClient()
     s.load_system_host_keys()
@@ -38,37 +38,35 @@ def cmd_exec(task_id,bind_host_id,user_id,cmd):
             cmd_result = filter(lambda x:len(x)>0,result)[0]
         else:
             cmd_result = 'execution has no output!'
-        #print cmd_result
-        res_status = 'success'
         s.close()
     except Exception,e:
         cmd_result = e
         res_status = 'failed'
-    #修改数据库中已有任务状态
-    # log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
-    # log_obj.event_log = cmd_result
-    # log_obj.result = res_status
-    # log_obj.save()
+    return cmd_result
 
-def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
-    #print '-->',task_id,bind_host_id,user_id,content
+def sftp_paramiko(bind_host_id):
+    bind_host = models.BindHosts.objects.get(id=bind_host_id)
+    t = paramiko.Transport((bind_host.host.ip_addr,int(bind_host.host.port) ))
+    if bind_host.host_user.auth_method == 'ssh-password':
+        t.connect(username=bind_host.host_user.username,password=bind_host.host_user.password)
+    else:
+        key = paramiko.RSAKey.from_private_key_file(settings.RSA_PRIVATE_KEY_FILE)
+        t.connect(username=bind_host.host_user.username,pkey=key)
+
+    sftp = paramiko.SFTPClient.from_transport(t)
+
+    return sftp
+
+def bigtask_pre_exec(task_id,bind_host_id,user_id,content):
     task_type = content[content.index('-task_type') + 1]
     remote_path = content[content.index('-remote') + 1]
     bind_host = models.BindHosts.objects.get(id=bind_host_id)
 
     try:
-        t = paramiko.Transport((bind_host.host.ip_addr,int(bind_host.host.port) ))
-        if bind_host.host_user.auth_method == 'ssh-password':
-
-            t.connect(username=bind_host.host_user.username,password=bind_host.host_user.password)
-        else:
-            key = paramiko.RSAKey.from_private_key_file(settings.RSA_PRIVATE_KEY_FILE)
-            t.connect(username=bind_host.host_user.username,pkey=key)
-
-        sftp = paramiko.SFTPClient.from_transport(t)
+        sftp = sftp_paramiko(bind_host_id)
 
         cmd_result = ''
-        if task_type == 'file_send':
+        if task_type == 'bigtask':
             local_file_list = content[content.index('-local') + 1].split()
             for filename in local_file_list:
                 f = filename.split('\\')[-1]
@@ -77,34 +75,34 @@ def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
                 sftp.put(filename,remote_file_path)
             cmd_result += "successfully send file %s to remote path [%s]" %(local_file_list,remote_path)
 
-        elif task_type == 'file_get':
-            local_path = '%s\\%s\\%s' %(settings.BASE_DIR,settings.FileUploadDir,user_id)
-            remote_filename = remote_path.split('/')[-1]
-            remote_filename_dl = '%s_%s' %(remote_filename,bind_host.host.ip_addr)
-            #print '--->',remote_filename_dl
-            sftp.get(remote_path, '%s/%s' %(local_path,remote_filename_dl))
-            cmd_result ='download remote file [%s] is completed!' % remote_path
+            #开始解压包
+            zipfile = [i for i in local_file_list if re.search(r".zip$",i)][0].split("\\")[-1]
+            remote_zipfile = remote_path + "/" + zipfile
+            cmd = 'unzip -o %s -d %s' %(remote_zipfile,remote_path)
+            cmd_result += cmd_paramiko(bind_host_id,cmd)
+            #########
+
         res_status = 'success'
-        t.close()
     except Exception,e:
         print e
         cmd_result = e
         res_status = 'failed'
-    # log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
-    # log_obj.event_log = cmd_result
-    # log_obj.result = res_status
-    # log_obj.save()
+    log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
+    log_obj.event_log = cmd_result
+    log_obj.result = res_status
+    log_obj.save()
 
 if __name__ == '__main__':
     require_args = ['-task_type','-task_id','-expire','-uid']
     lack_args = [arg for arg in require_args  if arg not in sys.argv[1:]]   #lack_args：缺少的必须参数
+    print "invoke scripts args has: ", sys.argv[1:]
     if len(lack_args) > 0:
         sys.exit("lack args of: %s" %lack_args)
 
     task_type = sys.argv[sys.argv.index('-task_type')+1]    #表示'-task_type'后一个
     if task_type =='cmd':
         require_args= ['-task',]
-    elif task_type == 'file_send':
+    elif task_type == 'file_send' or task_type == 'bigtask':
         require_args = ['-local','-remote']
     elif task_type == 'file_get':
         require_args = ['-remote',]
@@ -132,6 +130,8 @@ if __name__ == '__main__':
         task_func = cmd_exec
     elif task_type == 'file_send' or task_type == 'file_get':
         task_func = file_tranfer_exec
+    elif task_type == 'bigtask':
+        task_func = bigtask_pre_exec
     else:
         sys.exit('wrong task_type!')
 

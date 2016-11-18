@@ -12,7 +12,7 @@ from django.db import connection
 import sys,time,os
 import multiprocessing
 
-def cmd_exec(task_id,bind_host_id,user_id,cmd):
+def cmd_paramiko(bind_host_id,cmd):
     bind_host = models.BindHosts.objects.get(id=bind_host_id)
     s = paramiko.SSHClient()
     s.load_system_host_keys()
@@ -38,17 +38,35 @@ def cmd_exec(task_id,bind_host_id,user_id,cmd):
             cmd_result = filter(lambda x:len(x)>0,result)[0]
         else:
             cmd_result = 'execution has no output!'
-        #print cmd_result
-        res_status = 'success'
         s.close()
     except Exception,e:
         cmd_result = e
         res_status = 'failed'
+    return cmd_result
+
+def cmd_exec(task_id,bind_host_id,user_id,cmd):
+    cmd_result = cmd_paramiko(bind_host_id,cmd)
+    bind_host = models.BindHosts.objects.get(id=bind_host_id)
+    res_status = 'success'
+
     #修改数据库中已有任务状态
     log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
     log_obj.event_log = cmd_result
     log_obj.result = res_status
     log_obj.save()
+
+def sftp_paramiko(bind_host_id):
+    bind_host = models.BindHosts.objects.get(id=bind_host_id)
+    t = paramiko.Transport((bind_host.host.ip_addr,int(bind_host.host.port) ))
+    if bind_host.host_user.auth_method == 'ssh-password':
+        t.connect(username=bind_host.host_user.username,password=bind_host.host_user.password)
+    else:
+        key = paramiko.RSAKey.from_private_key_file(settings.RSA_PRIVATE_KEY_FILE)
+        t.connect(username=bind_host.host_user.username,pkey=key)
+
+    sftp = paramiko.SFTPClient.from_transport(t)
+
+    return sftp
 
 def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
     print '-->',task_id,bind_host_id,user_id,content
@@ -57,15 +75,7 @@ def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
     bind_host = models.BindHosts.objects.get(id=bind_host_id)
 
     try:
-        t = paramiko.Transport((bind_host.host.ip_addr,int(bind_host.host.port) ))
-        if bind_host.host_user.auth_method == 'ssh-password':
-
-            t.connect(username=bind_host.host_user.username,password=bind_host.host_user.password)
-        else:
-            key = paramiko.RSAKey.from_private_key_file(settings.RSA_PRIVATE_KEY_FILE)
-            t.connect(username=bind_host.host_user.username,pkey=key)
-
-        sftp = paramiko.SFTPClient.from_transport(t)
+        sftp = sftp_paramiko(bind_host_id)
 
         cmd_result = ''
         if task_type == 'file_send':

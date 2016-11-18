@@ -76,87 +76,33 @@ class MultiTask(object):
         host_ids = [int(i.split('host_')[-1]) for i in params.get('selected_hosts')]
         expire_time = params.get('expire_time')
         exec_hosts = models.BindHosts.objects.filter(id__in=host_ids)   #从数据库中取出要执行任务的主机
-        # task_type = self.request.POST.get('task_type')
-        task_type = "file_send"
+        task_type = self.request.POST.get('task_type')
         local_file_list = params.get('local_file_list')
         remote_file_path = params.get('remote_file_path')
 
-        content = "bigtask: send packages %s to remote path [%s]" %(local_file_list,params.get('remote_file_path'))
-        task_obj = self.create_task_log(task_type,exec_hosts,expire_time,content)
+        content = ""
         local_path = "%s\\%s\\%s" %(settings.BASE_DIR,settings.FileUploadDir,self.request.user.userprofile.id)
         if not os.path.isdir(local_path):
             os.mkdir(local_path)
 
-        task_obj.save()
         ############################
         #拷贝部署包到客户机并解包
-        p_send = subprocess.Popen(['python',
-                              settings.GigTaskScript,
-                              '-task_type',"file_send",
+        yaml_file = [i for i in local_file_list if re.search(r".yaml$",i)][0]
+        content = yaml.load(file(yaml_file,'r'))
+        content = json.dumps(content)
+        task_obj = self.create_task_log(task_type,exec_hosts,expire_time,content)
+        p = subprocess.Popen(['python',
+                              settings.BigTaskScript,
+                              '-task_type',task_type,
                               '-expire',expire_time,
                               '-uid',str(self.request.user.userprofile.id),
                               '-local',' '.join(local_file_list),
-                              '-remote',"/tmp",
+                              '-conf',content,
+                              '-remote',remote_file_path,
                               '-task_id',str(task_obj.id)])
-        zip_packages = [i for i in local_file_list if re.search(r".zip$",i)][0]
-        remote_zip_packages = "/tmp/" + zip_packages.split('\\')[-1]
-        if remote_zip_packages is not None:
-            #print remote_zip_packages
-            p_unzip = subprocess.Popen(['python',
-                              settings.GigTaskScript,
-                              '-task_type','cmd',
-                              '-expire',expire_time,
-                              '-uid',str(self.request.user.userprofile.id),
-                              '-task',"unzip %s -d /tmp"%remote_zip_packages,
-                              '-task_id',str(task_obj.id)])
-            task_dir = remote_zip_packages.split(".zip")[:-1]
-            print task_dir
         ############################
-        yaml_file = [i for i in local_file_list if re.search(r".yaml$",i)][0]
-        conf_dic = yaml.load(file(yaml_file,'r'))
-        #print conf_dic
-        cmd = conf_dic['cmd']
-        p_run = subprocess.Popen(['python',
-                              settings.GigTaskScript,
-                              '-task_type','cmd',
-                              '-expire',expire_time,
-                              '-uid',str(self.request.user.userprofile.id),
-                              '-task',cmd,
-                              '-task_id',str(task_obj.id)])
-        if conf_dic['file_get'] is not None:
-            fileget_ip_addr = conf_dic['file_get'][0]['ip_addr']
-            fileget_host = models.BindHosts.objects.get(host__ip_addr=fileget_ip_addr)
-            #print fileget_host
-            fileget_filename = conf_dic['file_get'][1]['filename']
-            fileget_filename_gen = fileget_filename + "_" + fileget_ip_addr
-            p_get1 = subprocess.Popen(['python',
-                              settings.GigTaskScript,
-                              '-task_type',"file_get",
-                              '-expire',expire_time,
-                              '-uid',str(self.request.user.userprofile.id),
-                              '-local','not_required',
-                              '-remote',fileget_filename,
-                              '-task_id',str(task_obj.id)])
 
-            if conf_dic['file_send'] is not None:
-                filesend_ip_addr = conf_dic['file_send'][0]['ip_addr']
-                filesend_host = models.BindHosts.objects.get(host__ip_addr=filesend_ip_addr)
-                #print filesend_host
-                #local_file_list = local_file_list[0].split('\\')[:-1] + '\\' + conf_dic['file_get'][1]['filename'].split('/')[:-1] + "_" + conf_dic['file_get'][0]['ip_addr']
-                #print local_file_list
-                #filesend_filename = '\\' + conf_dic['file_get'][1]['filename'].split('/')[:-1] + "_" + conf_dic['file_get'][0]['ip_addr']
-                #print filesend_filename
-                # p_send1 = subprocess.Popen(['python',
-                #                   settings.MultiTaskScript,
-                #                   '-task_type',"file_send",
-                #                   '-expire',expire_time,
-                #                   '-uid',str(self.request.user.userprofile.id),
-                #                   '-local',filesend_filename,
-                #                   '-remote',conf_dic['file_send'][1]['filename'],
-                #                   '-task_id',str(task_obj.id)])
-            if conf_dic['cmd2'] is not None:
-                cmd2 = conf_dic['cmd2']
-
+        task_obj.save()
         return task_obj.id
 
     @transaction.atomic     #函数从头执行到尾不中断
