@@ -115,26 +115,25 @@
                                 <input id="file-upload" name="filename" type="file" multiple class="file-loading">
                             </div>
                         </div>
-
-                        <select name="task-expire-time" class="btn-info">
-                            <option value="30">任务超时时间(30分钟)</option>
-                            <option value="45">45分钟</option>
-                            <option value="60">60分钟</option>
-                            <option value="90">90分钟</option>
-                            <option value="120">120分钟</option>
-                            <option value="180">180分钟</option>
-                        </select>
-                        <button id="bigtask-exec-btn" type="button" class="btn btn-success btn-labeled">
-                            <span class="btn-label"><i class="fa fa-download"></i></span> 保存任务
-                        </button>
-                        <button type="submit" class="btn btn-info btn-labeled">
-                            <span class="btn-label"><i class="fa fa-bicycle"></i></span> 开始执行
-                        </button>
-                        <!--Save draft button-->
-                        <button  onclick="TerminateTask()"  id="mail-save-btn" type="button" class="btn btn-danger btn-labeled">
-                            <span class="btn-label"><i class="fa fa-stop"></i></span> 停止
-                        </button>
                     </form>
+                    <select name="task-expire-time" class="btn-info">
+                        <option value="30">任务超时时间(30分钟)</option>
+                        <option value="45">45分钟</option>
+                        <option value="60">60分钟</option>
+                        <option value="90">90分钟</option>
+                        <option value="120">120分钟</option>
+                        <option value="180">180分钟</option>
+                    </select>
+                    <button id="bigtask-exec-btn" type="button" class="btn btn-success btn-labeled">
+                        <span class="btn-label"><i class="fa fa-download"></i></span> 保存任务
+                    </button>
+                    <button id="bigtask-ready-to-start" task_id="None" type="submit" class="btn btn-info btn-labeled">
+                        <span class="btn-label"><i class="fa fa-bicycle"></i></span> 开始执行
+                    </button>
+                    <!--Save draft button-->
+                    <button  onclick="TerminateTask()"  id="mail-save-btn" type="button" class="btn btn-danger btn-labeled">
+                        <span class="btn-label"><i class="fa fa-stop"></i></span> 停止
+                    </button>
 
                 </div>
 
@@ -190,19 +189,19 @@
 </div>
 <!--end 模态对话框-->
 <!-- Modal -<模态对话框-->
-<div class="modal fade" id="fileDownloadConfirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="BigtaskConfirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">文件下载确认</h4>
+        <h4 class="modal-title" id="myModalLabel">任务执行确认</h4>
       </div>
       <div class="modal-body">
-        <span id="modal_content">还有任务未完成，确定要下载么？</span>
+        <span id="modal_content">还有任务未完成初始化，确定要执行么？</span>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-        <button type="button"  class="btn btn-info" onclick='download_file(this)'><a href="{% url 'file_download_url' 0 %}">确定下载</a></button>
+        <button type="button"  class="btn btn-info" onclick='bigtask_start(this)'><a href="{% url 'bigtask_start' 0 %}" target="_blank">确定执行</a></button>
       </div>
     </div>
   </div>
@@ -248,33 +247,33 @@
                 upload_files.push(response.uploaded_file_path);
         });
 
-        $("#file-download-to-local").click(function(){
+        $("#bigtask-ready-to-start").click(function(){
             var task_id = $(this).attr('task_id');
             console.log('==task_id:' + task_id);
             if(task_id == 'None'){
-                $("#fileDownloadConfirm .modal-body span").html("任务还未执行，无文件可下载!");
-                $("#fileDownloadConfirm button[onclick='download_file(this)']").addClass("hide");
+                $("#BigtaskConfirm .modal-body span").html("任务还未完成初始化!");
+                $("#BigtaskConfirm button[onclick='bigtask_start(this)']").addClass("hide");
             }else{
-                $("#fileDownloadConfirm button[onclick='download_file(this)']").removeClass("hide");
+                $("#BigtaskConfirm button[onclick='bigtask_start(this)']").removeClass("hide");
                 //////////////////////
                 var total_task_num = $(".task-result .badge").length;
                 var total_undone_num = $(".task-result .badge-warning").length;
                 if (total_undone_num !=0){
-                    var html = total_task_num +"个主机中还有" + total_undone_num +"主机未返回结果，确认不等全部任务完成后再下载文件么?";
+                    var html = total_task_num +"个主机中还有" + total_undone_num +"主机未返回结果，确认不等全部完成后再执行任务么?";
                 }else{
-                    var html = total_task_num +"个主机已全部执行完毕，可以下载啦!";
+                    var html = total_task_num +"个主机已全部初始化完毕，可以执行任务啦!";
                 }
-                $("#fileDownloadConfirm .modal-body span").html(html);
+                $("#BigtaskConfirm .modal-body span").html(html);
             }
-            var download_url = $("#fileDownloadConfirm a").attr("href").split("/");
-            download_url.pop(); //删除列表最后一个元素
-            download_url.pop(); //删除列表最后一个元素
-            download_url = download_url.join("/") + "/" + task_id;
-            console.log(download_url)   //取出 /api/multitask/file_download
-            $("#fileDownloadConfirm a").attr("href",download_url);
+            var bigtask_url = $("#BigtaskConfirm a").attr("href").split("/");
+            bigtask_url.pop(); //删除列表最后一个元素
+            bigtask_url.pop(); //删除列表最后一个元素
+            bigtask_url = bigtask_url.join("/") + "/" + task_id;
+            console.log(bigtask_url)   //取出如 /api/multitask/file_download
+            $("#BigtaskConfirm a").attr("href",bigtask_url);
 
-            $("#fileDownloadConfirm").modal("show");
-        });//end file-download-to-local
+            $("#BigtaskConfirm").modal("show");
+        });//end bigtask-ready-to-start
 
         $('#bigtask-exec-btn').click(function(){   //执行大任务
             var expire_time = $("select[name='task-expire-time']").val();
@@ -353,7 +352,7 @@
                 $("#modal-content").attr("style","color:green;font:bold");
                 $(".task-result").html("");
                 /////////////////////
-                $("#file-download-to-local").attr("task_id",callback); //默认task_id=None，这里修改为此次任务id
+                $("#bigtask-ready-to-start").attr("task_id",callback); //默认task_id=None，这里修改为此次任务id
                 GetTaskResult(callback,'refresh');
             }else{
                 $("#modal-content").html("任务创建失败，请查看相关日志进行调试!");

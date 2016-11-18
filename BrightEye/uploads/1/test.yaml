@@ -1,10 +1,10 @@
 master:
   - ip_addr: 192.168.1.11
-  - cmd: sh /tmp/install-mysql.sh
+  - cmd: sh /tmp/install-mysql/install-mysql.sh
   - file_get: /tmp/my.cnf
-  - cmd2: sh /tmp/start-mysql.sh
+  - cmd2: sh /tmp/install-mysql/start-mysql.sh
 slave1:
   - ip_addr: 192.168.1.12
-  - cmd: sh /tmp/install-mysql.sh
+  - cmd: sh /tmp/install-mysql/install-mysql.sh
   - file_send: /tmp/my.cnf
-  - cmd2: sh /tmp/start-mysql.sh  
+  - cmd2: sh /tmp/install-mysql/start-mysql.sh  

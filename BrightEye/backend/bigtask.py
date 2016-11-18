@@ -126,11 +126,7 @@ if __name__ == '__main__':
     Pool = multiprocessing.Pool(processes=settings.MaxTaskProcesses) #进程池
     res_list = []
 
-    if task_type == 'cmd':
-        task_func = cmd_exec
-    elif task_type == 'file_send' or task_type == 'file_get':
-        task_func = file_tranfer_exec
-    elif task_type == 'bigtask':
+    if task_type == 'bigtask':
         task_func = bigtask_pre_exec
     else:
         sys.exit('wrong task_type!')

@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'multitask/file_download/(\d+)/$', views.file_download,name='file_download_url'),
     url(r'multitask/file/$', views.multitask_file,name='multitask_file'),
     url(r'multitask/bigtask/$', views.multitask_bigtask,name='multitask_bigtask'),
+    url(r'multitask/bigtask_start/(\d+)/$', views.bigtask_start,name='bigtask_start'),
 
 ]
