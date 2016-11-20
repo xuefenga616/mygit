@@ -198,15 +198,26 @@ class Bigtask_exec(object):
                 s_host = models.BindHosts.objects.get(host__ip_addr=s_ip_addr)   #从数据库中取出要执行任务的主机
                 print "slave1 host is %s" %s_host
                 cmd_result += multitask.cmd_paramiko(s_host.id,s_cmd)
-                print cmd_result
                 ##########################################
                 if m_get_file is not None:
                     s_send_file = s_conf_list[2]['file_send']
                     s_cmd2 = s_conf_list[3]['cmd2']
                     ##########################################
                     #开始处理第三组命令
+                    get_sftp = multitask.sftp_paramiko(m_host.id)
+                    m_get_file_basename = m_get_file.split('/')[-1]
+                    tmp_file = '%s\\%s' %(local_path,m_get_file_basename)
+                    get_sftp.get(m_get_file, tmp_file)
+                    cmd_result += '\ndownload remote file [%s] is completed!\n' %m_get_file
 
+                    send_sftp = multitask.sftp_paramiko(s_host.id)
+                    send_sftp.put(tmp_file, s_send_file)
+                    cmd_result += "successfully send file %s to remote path [%s]\n\n" %(tmp_file,'/'.join(s_send_file.split('/')[:-1]))
+
+                    cmd_result += multitask.cmd_paramiko(m_host.id,m_cmd2)
+                    cmd_result += multitask.cmd_paramiko(s_host.id,s_cmd2)
                     ##########################################
+        print cmd_result
         print """
             m_ip_addr is: %s,
             m_cmd is: %s,
@@ -218,6 +229,8 @@ class Bigtask_exec(object):
             s_send_file is: %s,
             s_cmd2 is: %s,
         """ %(m_ip_addr,m_cmd,m_get_file,m_cmd2,s_ip_addr,s_cmd,s_send_file,s_cmd2)
+
+        return cmd_result
 
 
 

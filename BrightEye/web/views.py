@@ -110,13 +110,14 @@ def multitask_bigtask(request):
     return HttpResponse(task_id)
 
 @login_required
-def bigtask_start(request,task_id):
+def bigtask_log(request,task_id):
     local_path = "%s\\%s\\%s" %(settings.BASE_DIR,settings.FileUploadDir,request.user.userprofile.id)
     bigtask_obj = models.TaskLog.objects.get(id=int(task_id))
     conf_dic = bigtask_obj.cmd
     conf_dic = json.loads(conf_dic)
     #print conf_dic
     multi_task = host_mgr.Bigtask_exec(task_type='bigtask_exec',local_path=local_path,**conf_dic)
-    multi_task.run()
+    cmd_result = multi_task.run()
 
-    return HttpResponse('dd')
+    return render(request,'bigtask_log.html',{'task_id':task_id,
+                                              'log':cmd_result})
