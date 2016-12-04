@@ -83,25 +83,22 @@ class StatusSerializer(object):
             'ok_nums': None,
         }
 
-        uptime = self.get_host_uptime(host_obj)     #上线时间
-        # if uptime:
-        #     print 'uptime:', uptime
-        #     data['uptime'] = uptime[0]['uptime']
-        #     print 'mktime:', time.gmtime(uptime[1])
-        #     data['last_update'] = time.strftime("%Y-%m-%d %H:%M:%s", time.localtime(uptime[1]))
+        uptime = self.get_host_uptime(host_obj)     #
+        if uptime:
+            print 'uptime:', uptime[0],uptime[1]
+            data['uptime'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(float(uptime[0])))
+            data['last_update'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(float(uptime[1])))
 
         #for triggers
         data['triggers'] = self.get_triggers(host_obj)
         return data
     def get_host_uptime(self,host_obj):
         redis_key = 'StatusData_%s_uptime_latest' %host_obj.id
-        last_data_point = self.redis.lrange(redis_key,-1,-1)
-        print last_data_point
+        # last_data_point = self.redis.lrange(redis_key,-1,-1)
+        last_data_point = self.redis.lrange(redis_key,0,-1)
 
-        # if last_data_point:
-        #     print "----last uptime point:", last_data_point[0]
-        #     last_data_point,last_update = json.loads(last_data_point[0])
-        #     return last_data_point,last_update
+        return last_data_point
+
     def get_triggers(self,host_obj):
         trigger_keys = self.redis.keys('host_%s_trigger_*' %host_obj.id)
         '''

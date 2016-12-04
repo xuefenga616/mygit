@@ -7,8 +7,8 @@ from BrightMonitor import settings
 from redis_conn import RedisHelper as redis
 
 class DataStore(object):
-    def __init__(self,client_id,service_name,data):
-        self.redis = redis()
+    def __init__(self,main_ins,client_id,service_name,data):
+        self.redis = main_ins
         self.client_id = client_id
         self.service_name = service_name
         self.data = data
@@ -40,10 +40,10 @@ class DataStore(object):
         #print self.client_id,self.service_name,self.data
         if self.data['status'] == 0:    #service data is valid
 
-            uptime_in_redis_key = 'StatusData_%s_uptime_latest' %self.client_id
-            ######################################
-            ######################################
-            ######################################
+            uptime_in_redis_key = 'StatusData_%s_uptime_latest' %self.client_id     #对uptime进行操作，存到redis列表
+            if self.redis.llen(uptime_in_redis_key) < 2:
+                self.redis.rpush(uptime_in_redis_key,json.dumps(time.time()))
+            self.redis.lset(uptime_in_redis_key,1,json.dumps(time.time()))
 
             for key,data_series_val in settings.STATUS_DATA_OPTIMIZATION.items():
                 data_series_key_in_redis = "StatusData_%s_%s_%s" %(self.client_id,self.service_name,key)

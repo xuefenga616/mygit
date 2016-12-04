@@ -39,6 +39,8 @@ class RedisHelper:
         return self.__conn.llen(List)
     def lpop(self,List):
         return self.__conn.lpop(List)
+    def lset(self,List,index,key):
+        return self.__conn.lset(List,index,key)
 
 class RedisHelper2:
     def __init__(self):

@@ -20,14 +20,14 @@ from BrightMonitorClient.conf import settings as c_settings
 import threading
 
 class DataHandler(object):
-    def __init__(self,connect_redis=True):
+    def __init__(self,main_ins):
         self.poll_interval = 20
         self.config_update_interval = 120
         self.config_last_loading_time = time.time() #当时时间戳
         self.global_monitor_dic = {}
         self.exit_flag = False
         #if connect_redis:
-        self.redis = redis()
+        self.redis = main_ins
 
     def looping(self):
         self.update_or_load_configs()   #生成全局的监控配置dict
