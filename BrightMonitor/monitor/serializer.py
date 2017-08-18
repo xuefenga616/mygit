@@ -32,7 +32,7 @@ class ClientHandler(object):
 class TriggersView(object):
     def __init__(self,request):
         self.request = request
-        self.redis = redis()
+        self.redis = redis.instance()
     def fetch_related_filters(self):
         by_host_id = self.request.GET.get('by_host_id')
         print '---host id:',by_host_id
@@ -64,7 +64,7 @@ def get_host_triggers(host_obj):
 class StatusSerializer(object):
     def __init__(self,request):
         self.request = request
-        self.redis = redis()
+        self.redis = redis.instance()
     def by_hosts(self):
         host_obj_list = models.Host.objects.all()
         host_data_list = []

@@ -1,0 +1,10 @@
+
+sklearn
+gensim      # 主题模型
+numpy
+xgboost     # 逐步增强树
+matplotlib
+pandas
+Natural Language Toolkit    # 英文自然语言处理
+TensorFlow
+Keras

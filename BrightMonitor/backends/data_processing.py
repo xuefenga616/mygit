@@ -114,32 +114,32 @@ class DataHandler(object):
         :param trigger_obj
         :return
         '''
-        #self.redis = redis()
+        #self.redis = redis.instance()
         calc_sub_res_list = []  #先把每个expression的结果算出来放在这个列表里，最后再统一计算这个列表
         positive_expressions = []
         expression_res_string = ''
         for expression in trigger_obj.triggerexpression_set.select_related().order_by('id'):
-            print expression, expression.logic_type
+            print(expression, expression.logic_type)
             expression_process_obj = ExpressionProcess(self,host_obj,expression)
             single_expression_res = expression_process_obj.process()
             if single_expression_res:
                 calc_sub_res_list.append(single_expression_res)
-                if single_expression_res['expression_obj'].logic_type:  #不是最后一条，条件关系最后一条没选是None
+                if single_expression_res['expression_obj'].logic_type:  # 不是最后一条，条件关系最后一条没选是None
                     expression_res_string += str(single_expression_res['calc_res']) + ' ' + \
                                             single_expression_res['expression_obj'].logic_type + ' '
                 else:
                     expression_res_string += str(single_expression_res['calc_res']) + ' '
 
-                #把所有结果为True的expression提取出来，报警时你就知道什么问题导致trigger触发了
+                # 把所有结果为True的expression提取出来，报警时你就知道什么问题导致trigger触发了
                 if single_expression_res['calc_res'] == True:
-                    single_expression_res['expression_obj'] = single_expression_res['expression_obj'].id #要存到redis，数据库对象转成id
+                    single_expression_res['expression_obj'] = single_expression_res['expression_obj'].id # 要存到redis，数据库对象转成id
                     positive_expressions.append(single_expression_res)
         if expression_res_string:
-            trigger_res = eval(expression_res_string)   #取string第一个值
-            print "whole trigger res:", trigger_res
-            if trigger_res:     #此时触发了报警
-                print "##############trigger alert:",trigger_obj.severity,trigger_res
-                self.trigger_notifier(host_obj,trigger_obj.id,positive_expressions,msg=trigger_obj.name)    #msg需要专门分析后生成
+            trigger_res = eval(expression_res_string)   # 取string第一个值
+            print("whole trigger res:", trigger_res)
+            if trigger_res:     # 此时触发了报警
+                print("##############trigger alert:",trigger_obj.severity,trigger_res)
+                self.trigger_notifier(host_obj,trigger_obj.id,positive_expressions,msg=trigger_obj.name)    # msg需要专门分析后生成
 
 
     def data_point_validation(self,host_obj,service_obj):
@@ -162,7 +162,7 @@ class DataHandler(object):
         :param msg
         :return
         '''
-        self.redis2 = redis2()      #redis2 是trigger专用fm107.8
+        self.redis2 = redis2.instance()     #redis2 是trigger专用fm107.8
         print "\033[43;1m going to send alert msg...........\033[0m"
         print "trigger_notifier argv:",host_obj,trigger_id,positive_expressions
 
@@ -192,7 +192,7 @@ class DataHandler(object):
             msg_dic['start_time'] = trigger_startime
             msg_dic['duration'] = round(time.time() - trigger_startime)
         #同时在redis中记录这个trigger，前端页面展示时要 统计trigger个数
-        self.redis2.set_300(trigger_redis_key,json.dumps(msg_dic),300)  #一个trigger记录5分钟后自动清除（过期）
+        self.redis2.setn(trigger_redis_key,json.dumps(msg_dic),300)  #一个trigger记录5分钟后自动清除（过期）
 
 
 class ExpressionProcess(object):    #load data and calc it by different method

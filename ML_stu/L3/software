@@ -1,0 +1,13 @@
+# 常用软件包
+
+Theano
+Pylearn2
+scikit-neuralnetwork    #依赖numpy scipy theano matplotlib
+
+Caffe
+
+Deeplearning4j
+
+Torch
+
+http://deeplearning.net/software_links/

@@ -1,0 +1,39 @@
+{% extends 'index.html' %}
+
+{% block page-title %}
+任务日志
+{% endblock %}
+
+
+{% block page-content %}
+{% csrf_token %}
+<div class="row">
+
+    <div class="col-sm-7 col-lg-12 pull-right task-res-div">
+        <div class="panel">
+
+            <div class="pad-ver task-summary-panel">
+                <span  id="current-task-id" style="font-size:15px;background-color:darkslateblue" class="badge badge-primary">任务ID: {{ task_id }}<span></span></span>
+{#                        <span id="total-tasks"  style="font-size:15px;" class="badge badge-primary">总任务<span>n/a</span></span>#}
+{#                        <span id="finished-tasks" style="font-size:15px;" class="badge badge-success">已完成<span>n/a</span></span>#}
+{#                        <span id="failed-tasks"  style="font-size:15px;" class="badge badge-danger">失败<span>n/a</span></span>#}
+{#                        <span id="unkown-tasks" style="font-size:15px;" class="badge badge-warning">剩余<span>n/a</span></span>#}
+{#                        <span onclick="task_detail_toggle('chosen',this)" style="font-size:15px;background-color:gray" class="badge badge-primary"><i class="fa fa-chevron-circle-down"></i> 收缩/展开</span>#}
+
+            </div>
+            <div class="panel-body">
+                <div class="task-result">
+                    <pre>{{ log|safe }}</pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div> <!--end row-->
+
+{% endblock %}
+
+{% block bottom-js %}
+
+{% endblock %}

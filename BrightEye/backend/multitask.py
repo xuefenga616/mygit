@@ -68,8 +68,15 @@ def sftp_paramiko(bind_host_id):
 
     return sftp
 
-def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
-    print '-->',task_id,bind_host_id,user_id,content
+def file_tranfer_exec(task_id, bind_host_id, user_id, content):
+    '''
+    :param task_id: 任务id
+    :param bind_host_id: 绑定主机的id
+    :param user_id: 用户id
+    :param content: 待传输文件路径
+    :return: 
+    '''
+    print('-->',task_id,bind_host_id,user_id,content)
     task_type = content[content.index('-task_type') + 1]
     remote_path = content[content.index('-remote') + 1]
     bind_host = models.BindHosts.objects.get(id=bind_host_id)
@@ -90,14 +97,16 @@ def file_tranfer_exec(task_id,bind_host_id,user_id,content ):
             local_path = '%s\\%s\\%s' %(settings.BASE_DIR,settings.FileUploadDir,user_id)
             remote_filename = remote_path.split('/')[-1]
             remote_filename_dl = '%s_%s' %(remote_filename,bind_host.host.ip_addr)
-            print '--->',remote_filename_dl
+            print('--->',remote_filename_dl)
             sftp.get(remote_path, '%s/%s' %(local_path,remote_filename_dl))
             cmd_result ='download remote file [%s] is completed!' % remote_path
         res_status = 'success'
-    except Exception,e:
-        print e
+    except Exception as e:
+        print(e)
         cmd_result = e
         res_status = 'failed'
+
+    # 修改数据库中已有任务状态
     log_obj = models.TaskLogDetail.objects.get(child_of_task_id=int(task_id),bind_host_id=bind_host.id)
     log_obj.event_log = cmd_result
     log_obj.result = res_status

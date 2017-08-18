@@ -1,0 +1,18 @@
+分类问题：classification
+                                    算法                 权重或其他参数
+决策树decision tree                entropy                             #信息熵
+临近取样KNN                         majority-voting     1/distance      #投票法则
+支持向量机Support vector Machine    linear                              #找到最大边际的超平面
+神经网络Neural Network
+
+
+回归问题：regression
+
+多元回归multiple regression
+非线性回归logistic regression
+
+聚类Clustering:
+
+K-means
+层次聚类hierarchical clustering
+

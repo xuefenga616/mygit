@@ -18,7 +18,7 @@ class TriggerHandler(object):
         }
 
     def start_watching(self):
-        self.redis2 = redis2()
+        self.redis2 = redis2.instance()
         redis_sub2 = self.redis2.subscribe()  #订阅trigger消息
         #print "\033[43;1m*******start listening new triggers*******\033[0m"
         self.trigger_cnt = 0
@@ -36,7 +36,7 @@ class TriggerHandler(object):
         action.trigger_process()
 
     def start(self):
-        self.redis = redis()
+        self.redis = redis.instance()
         redis_sub = self.redis.subscribe()  #订阅report消息
 
         while True:

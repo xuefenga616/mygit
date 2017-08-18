@@ -94,12 +94,12 @@ def bigtask_pre_exec(task_id,bind_host_id,user_id,content):
 
 if __name__ == '__main__':
     require_args = ['-task_type','-task_id','-expire','-uid']
-    lack_args = [arg for arg in require_args  if arg not in sys.argv[1:]]   #lack_args：缺少的必须参数
-    print "invoke scripts args has: ", sys.argv[1:]
+    lack_args = [arg for arg in require_args  if arg not in sys.argv[1:]]   # lack_args：缺少的必须参数
+    print("invoke scripts args has: ", sys.argv[1:])
     if len(lack_args) > 0:
         sys.exit("lack args of: %s" %lack_args)
 
-    task_type = sys.argv[sys.argv.index('-task_type')+1]    #表示'-task_type'后一个
+    task_type = sys.argv[sys.argv.index('-task_type')+1]                    # 表示'-task_type'后一个
     if task_type =='cmd':
         require_args= ['-task',]
     elif task_type == 'file_send' or task_type == 'bigtask':
@@ -121,9 +121,9 @@ if __name__ == '__main__':
     uid = sys.argv[sys.argv.index('-uid')+1]
 
     task_obj = models.TaskLog.objects.get(id=int(task_id))
-    connection.close()  #关闭数据库
+    connection.close()                                                      # 关闭数据库
 
-    Pool = multiprocessing.Pool(processes=settings.MaxTaskProcesses) #进程池
+    Pool = multiprocessing.Pool(processes=settings.MaxTaskProcesses)        # 进程池
     res_list = []
 
     if task_type == 'bigtask':
@@ -137,7 +137,3 @@ if __name__ == '__main__':
 
     Pool.close()
     Pool.join()
-    # for h in task_obj.hosts.select_related():
-    #     task_func(task_id,h.id,uid,content)
-
-    #NE93259839042

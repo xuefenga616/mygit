@@ -12,11 +12,21 @@ django.setup()
 from BrightMonitor import settings
 import redis
 
+# 创建1个redis连接使用的公共类
 class RedisHelper:
+    __static_instance = None
     def __init__(self):
         self.__conn = redis.Redis(host=settings.REDIS_CONN['HOST'],port=6379,db=0,password=settings.REDIS_CONN['PASSWD'])
         self.chan_sub = 'fm104.5'
         self.chan_pub = 'fm104.5'
+    @classmethod
+    def instance(cls):                          # 单例模式
+        # cls = RedisHelper
+        if cls.__static_instance:
+            return cls.__static_instance
+        else:
+            cls.__static_instance = RedisHelper()
+            return cls.__static_instance
     def get(self,key):
         return self.__conn.get(key)
     def set(self,key,value):
@@ -34,7 +44,7 @@ class RedisHelper:
     def keys(self,pattern):
         return self.__conn.keys(pattern)
     def rpush(self,List,value):
-        return self.__conn.rpush(List,value)    #把值插入列表尾部
+        return self.__conn.rpush(List,value)    # 把值插入列表尾部
     def llen(self,List):
         return self.__conn.llen(List)
     def lpop(self,List):
@@ -43,15 +53,24 @@ class RedisHelper:
         return self.__conn.lset(List,index,key)
 
 class RedisHelper2:
+    __static_instance = None
     def __init__(self):
         self.__conn = redis.Redis(host=settings.REDIS_CONN['HOST'],port=6379,db=0,password=settings.REDIS_CONN['PASSWD'])
         self.chan_sub = 'fm107.8'
         self.chan_pub = 'fm107.8'
+    @classmethod
+    def instance(cls):  # 单例模式
+        # cls = RedisHelper
+        if cls.__static_instance:
+            return cls.__static_instance
+        else:
+            cls.__static_instance = RedisHelper2()
+            return cls.__static_instance
     def get(self,key):
         return self.__conn.get(key)
     def set(self,key,value):
         return self.__conn.set(key,value)
-    def set_300(self,key,value,timeout):
+    def setn(self,key,value,timeout):
         return self.__conn.set(key,value,timeout)
     def public(self,msg):
         self.__conn.publish(self.chan_pub,msg)

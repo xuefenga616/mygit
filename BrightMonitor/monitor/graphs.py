@@ -8,7 +8,7 @@ from backends.redis_conn import RedisHelper2 as redis2
 class GraphGenerator(object):   #产生流量图
     def __init__(self,request):
         self.request = request
-        self.redis2 = redis2()
+        self.redis2 = redis2.instance()
         self.host_id = self.request.GET.get('host_id')
         self.time_range = self.request.GET.get('time_range')    #获取要从redis中取多长时间的数据，单位是min，eg:10min
 
