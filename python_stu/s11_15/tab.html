@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div>
+            <div onclick="Change(this)">菜单一</div>
+            <div class="content">
+                <div>1</div>
+                <div>2</div>
+                <div>3</div>
+            </div>
+        </div>
+
+        <div>
+            <div onclick="Change(this)">菜单二</div>
+            <div class="content hide">
+                <div>11</div>
+                <div>22</div>
+                <div>33</div>
+            </div>
+        </div>
+
+        <div>
+            <div onclick="Change(this)">菜单三</div>
+            <div class="content hide">
+                <div>111</div>
+                <div>222</div>
+                <div>333</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //
+    });
+    function Change(arg){
+        console.log($(arg).text());  //$(arg)表示当前点击的标签
+        //1、找到下一个标签，移除hide
+        $(arg).next().removeClass('hide');
+        //2、找到其他菜单，内容隐藏，添加hide
+        $(arg).parent().siblings().find('.content').addClass('hide');
+    }
+</script>
+</html>

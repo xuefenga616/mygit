@@ -1,0 +1,29 @@
+{% load tag01 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <form action="/app01/login/" method="post">
+        <p>{{ obj.username }}<span style="color: red">{% errors_msg errors.username %}</span></p>
+        <p>{{ obj.password }}<span style="color: red">{% errors_msg errors.password %}</span></p>
+        <input type="submit" onclick="SubmitAjax();" value="Ajax">
+        <input type="submit" value="Submit">
+    </form>
+</body>
+<script src="/static/js/jquery.min.js"></script>
+<script>
+    function SubmitAjax(){
+        $.ajax({
+            'url': '/app01/login/',
+            'type': 'POST',
+            'data': {'username': '', 'password': ''},
+            success: function(arg){
+                console.log(arg);
+            }
+        });
+    }
+</script>
+</html>

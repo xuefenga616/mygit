@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body id="currentPosition">
+    <div class="chapter" style="height: 400px;">
+        <h1>第一章</h1>
+    </div>
+    <div class="chapter" style="height: 400px;">
+        <h1>第二章</h1>
+    </div>
+    <div class="chapter" style="height: 400px;">
+        <h1>第三章</h1>
+    </div>
+</body>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $(window).scroll(function(){    //窗体绑定scroll事件
+            var scroll_top = $(window).scrollTop;   //获取窗体滑轮的高度
+            var list = []
+            $.each($(".chapter"),function(i){
+                var current_height = $($(".chapter")[i]).offset().top;
+                list.push(current_height);
+            });//end each
+            $.each(list,function(i){
+                if(scroll_top + $(window).height() == $(document).height()){
+                    $("#currentPosition").text($(".chapter").last().text());
+                    return
+                }
+                if(scroll_top > list[i]){
+                    $("#currentPosition").text($($(".chapter")[i]).text());
+                    return
+                }
+            });//end each
+        });
+    });
+//    var top1 = $(".chapter").offset().top;
+//    console.log(top1)
+
+</script>
+</html>

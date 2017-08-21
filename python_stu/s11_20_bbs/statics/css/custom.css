@@ -1,0 +1,64 @@
+.left-content-panel{
+    border: 2px solid crimson;
+}
+
+.right-sidebar{
+    border: 2px solid black;
+}
+
+.article-box{
+    /*margin-bottom: 5px;*/
+}
+
+.article-head-img img{
+    height: 125px;
+    width: 220px;
+}
+
+.article-summary{
+    margin-left: 10px;
+}
+
+.comment-node{
+    border: 2px dashed #afd9ee;
+    border-top: 0px;
+    margin-bottom: 10px;
+}
+
+.chat-container{
+    height: 600px;
+    border: 1px solid;
+}
+
+.contact-list{
+    height: 600px;
+    border: 1px crimson;
+}
+
+.chat-box{
+    height: 600px;
+    border: 1px aqua;
+}
+
+.chat-header{
+    background-color: #27C0D8;
+    height: 25px;
+}
+
+.chat-content{
+    border: 1px solid greenyellow;
+    height: 500px;
+    overflow: auto;
+}
+
+.chat-msg-sendbox{
+    height: 75px;
+    /*background-color: lightcyan;*/
+}
+
+.msg-box textarea{
+    height: 72px;
+    width: 100px;
+    resize: none;
+    border: none;
+}

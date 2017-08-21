@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="i1">
+        <a>old boy</a>
+    </div>
+    <div id="i2" style="background-color: red;">
+        <a>young boy</a>
+    </div>
+
+    <div id="search-conditions">
+        <div class="condition">
+            <a onclick="AddCondition(this,'#search-conditions');"> + </a>
+            <input>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+//    $("#i1").prepend("<div>dfffsdfsdfdsd</div>")
+//    $("#i1").appendTo("#i2")    //把一个标签移动到另一标签里面
+    $('#i1').before("<h1>alex</h1>")
+
+    function AddCondition(ths,container){
+        //1、copy condition div
+        var cp = $(ths).parent().clone()
+        //2、再把copy的div追加到search_conditions下面
+        cp.children(":first").text("-");    //第一个孩子
+        cp.children(":first").attr("onclick","RemoveCondition(this,'#search-conditions');");  //改标签内属性
+        cp.appendTo(container);
+    }
+    function RemoveCondition(ths,container){
+        $(ths).parent().remove();
+    }
+</script>
+</html>

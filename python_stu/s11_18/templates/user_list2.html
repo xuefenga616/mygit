@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <hr>
+    <input type="button" onclick="AjaxSubmit();" value="Ajax提交">
+    <table>
+        <thead>
+            <tr>
+                <th>主机名</th>
+                <th>端口</th>
+            </tr>
+        </thead>
+        <tbody id="tbd">
+            <tr>
+                <td>1.1.1.1</td>
+                <td>9999</td>
+            </tr>
+            <tr>
+                <td>1.1.1.2</td>
+                <td>9998</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript">
+    function AjaxSubmit(){
+        var host = "1.1.1.1";
+        var port = "9999";
+        $.ajax({
+            url: "/app02/ajax_data/",
+            type: "POST",
+            data: {h:host, p:port},
+            success: function(arg){
+                //
+            }
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,226 @@
+{% extends 'index.html' %}
+
+{% block page-container %}
+<h1>聊天室</h1>{% csrf_token %}
+
+<div>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#contacts" role="tab" data-toggle="tab">联系人</a></li>
+    <li role="presentation"><a href="#groups" role="tab" data-toggle="tab">群组</a></li>
+    <li role="presentation"><a href="#notifications" role="tab" data-toggle="tab">通知</a></li>
+    <li role="presentation"><a href="#settings" role="tab" data-toggle="tab">配置</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="contacts">
+        <div class="chat-container row">
+    <div class="contact-list col-md-3">
+        <div class="list-group">
+{#          <a href="#" class="list-group-item active">#}
+{#            Cras justo odio#}
+{#          </a>#}
+{#          <a href="#" class="list-group-item">Dapibus ac facilisis in</a>#}
+{#          <a href="#" class="list-group-item">Morbi leo risus</a>#}
+{#          <a href="#" class="list-group-item">Porta ac consectetur ac</a>#}
+{#          <a href="#" class="list-group-item">Vestibulum at eros</a>#}
+        </div>
+    </div>
+
+    <div class="chat-box col-md-9">
+        <div class="chat-header">talking with ...</div>
+        <div class="chat-content">content</div>
+        <div class="chat-msg-sendbox row">
+            <div class="msg-box col-md-9">
+                <textarea></textarea>
+            </div>
+            <div class="msg-box-btn col-md-3">
+                <button type="button" class="btn btn-success">发送</button>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="groups">profile...</div>
+    <div role="tabpanel" class="tab-pane" id="notifications">...</div>
+    <div role="tabpanel" class="tab-pane" id="settings">...</div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block bottom-js %}
+<script>
+$(document).ready(function(){
+    GLOBAL_SESSION_CACHE = {
+        'single_contact': {},
+        'group_contact': {}
+    };  //全局字典存消息
+
+    //load all contacts
+    LoadContacts();
+
+    $("body").delegate("textarea","keydown",function(e){    //按键事件
+
+        if(e.which == 13){     //按下了回车键
+            var msg_text = $("textarea").val();
+            if($.trim(msg_text).length > 0){
+                console.log(msg_text);
+                SendMsg(msg_text);
+            }
+            AddSentMsgIntoChatBox(msg_text);
+            $("textarea").val('');  //清空
+        }
+    });  //end body
+
+    //定时器定时收消息
+{#    var RefreshNewMsgs = setInterval(function(){#}
+{#        GetNewMsgs();   //取消息#}
+{#    },3000);    //setInterval()每次都会起个新线程#}
+    GetNewMsgs();
+});
+
+function SendMsg(msg_text){
+    var contact_id = $(".chat-header span").attr("contact_id");
+    var contact_type = $(".chat-header span").attr("contact_type");
+    var msg_dic = {
+        'contact_type': contact_type,
+        'to': contact_id,
+        'from': "{{ request.user.userprofile.id }}",
+        'from_name': "{{ request.user.userprofile.name }}",
+        'msg':msg_text,
+    }
+    var csrf_val = $("input[name='csrfmiddlewaretoken']").val();
+    $.post("{% url 'msg_send' %}",{'data':JSON.stringify(msg_dic),'csrfmiddlewaretoken':csrf_val},function(callback){
+        console.log(callback);
+    });//end post
+}
+
+function AddSentMsgIntoChatBox(msg_text){
+    var t = new Date()
+    var send_time = t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds()
+    var msg_ele = "<div class='msg-item-send'>" + "<p>" + "{{ request.user.userprofile.name }} &nbsp" +
+                    send_time + "</p>" +
+                    "<p>" + msg_text + "</p>" +
+                    "</div>"
+    $(".chat-content").append(msg_ele);
+    $(".chat-content").animate({    //自动滚动到最后
+        scrollTop:$(".chat-content")[0].scrollHeight
+    },500);
+}
+
+function AddRecvMsgToChatBox(msg_text){
+    var msg_ele = "<div class='msg-item-recv'>" + "<p>" + msg_text.from_name + " &nbsp;&nbsp" +
+                    msg_text['timestamp'] + "</p>" +
+                    "<p>" + msg_text['msg'] + "</p>" +
+                    "</div>"
+    $(".chat-content").append(msg_ele);
+    $(".chat-content").animate({    //自动滚动到最后
+        scrollTop:$(".chat-content")[0].scrollHeight
+    },500);
+}
+
+function LoadContacts(){
+    $.get("{% url 'load_contact_list' %}",function(callback){
+        //console.log(callback);
+        var data = JSON.parse(callback);
+        $.each(data.contact_list, function(index,ele){
+            var e = "<a onclick='OpenDialogBox(this);' class='list-group-item' contact_id='"
+                    + ele.id + "' contact_type='single_contact'>" +
+                    ele.name + "<span class='badge'>0</span></a>"
+            $(".contact-list .list-group").append(e);
+        });//end each
+    });//end get
+}
+
+function OpenDialogBox(ele){
+    var contact_id = $(ele).attr("contact_id");
+    var contact_type = $(ele).attr("contact_type");
+    var contact_name = $(ele).text();
+
+    // dump current session contents
+    DumpSession();
+
+    var e = "<h4><span contact_id='" + contact_id + "'" +
+                    "contact_type='" + contact_type + "'>Talking with: " +
+                    contact_name + "</span></h4>"
+    $(".chat-header").html(e);
+
+    $(".chat-content").html(LoadSession(contact_id,contact_type));
+
+    //clear the unread msg num flags
+    //找到a标签里的span
+    var unread_msg_num_ele = $(ele).find('span')[0];
+    $(unread_msg_num_ele).text(0);
+    $(unread_msg_num_ele).css('display','none');    //塞进css样式'display:none'
+}
+
+function DumpSession(){
+    var current_contact_id = $(".chat-header span").attr("contact_id");
+    var current_contact_type = $(".chat-header span").attr("contact_type");
+    console.log($(".chat-content").html());   //取到对应的html
+    if(current_contact_id){     //选取了聊天对象
+        GLOBAL_SESSION_CACHE[current_contact_type][current_contact_id] = $(".chat-content").html();
+    }
+}
+
+function LoadSession(contact_id,contact_type){
+    if(GLOBAL_SESSION_CACHE[contact_type].hasOwnProperty(contact_id)){
+        var session_html = GLOBAL_SESSION_CACHE[contact_type][contact_id]
+    }else{
+        var session_html = ''
+    }
+    //
+    return session_html;
+}
+
+function GetNewMsgs(){
+    $.get("{% url 'msg_send' %}",function(callback){
+        console.log(callback);
+        var msg_list = JSON.parse(callback);
+        var current_open_session_type = $(".chat-header span").attr("contact_type");
+        var current_open_session_id = $(".chat-header span").attr("contact_id");    //选中的人
+        $.each(msg_list,function(index,ele){
+            if(ele.contact_type == current_open_session_type){
+                if(ele.from == current_open_session_id){
+                    AddRecvMsgToChatBox(ele);
+                }else{  //代表session当前未被打开
+                    var old_session_content = LoadSession(ele.from,ele.contact_type);
+                    var new_msg_ele = GenerateNewMsgItem(ele);
+                    var new_session_content = old_session_content + new_msg_ele;
+                    DumpSession2(ele.from,ele.contact_type,new_session_content);
+                    UpdateUnreadMsgNums(ele.from,ele.contact_type);
+                }
+            }
+        });//end each
+        //start a new request again 处理完了，再调自己发起新请求
+        console.log("----run again----");
+        GetNewMsgs()
+    });//end get
+}
+
+function GenerateNewMsgItem(msg_text){
+    var msg_ele = "<div class='msg-item-recv'>" + "<p>" + msg_text.from_name + " &nbsp;&nbsp" +
+                    msg_text['timestamp'] + "</p>" +
+                    "<p>" + msg_text['msg'] + "</p>" +
+                    "</div>"
+    return msg_ele
+}
+
+function DumpSession2(contact_id,contact_type,content){
+    if(contact_id){     //选取了聊天对象
+        GLOBAL_SESSION_CACHE[contact_type][contact_id] = content;
+    }
+}
+
+function UpdateUnreadMsgNums(contact_id,contact_type){
+    var msg_num_ele = $(".contact-list a[contact_id='"+ contact_id +"']").find('span')[0];
+    $(msg_num_ele).text(parseInt($(msg_num_ele).text()) + 1)
+    $(msg_num_ele).show();  //显示数字
+}
+
+</script>
+{% endblock %}

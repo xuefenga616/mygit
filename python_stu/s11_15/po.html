@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body style="margin: 0px auto;">
+    <div style="height: 1500px">
+
+    </div>
+    <div id="i1">dfdf</div>
+    <div style="padding:50px; position: relative;">
+        <div id="i2">a</div>
+    </div>
+</body>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //
+    });
+    console.log($('#i1').offset())      //针对整个页面
+    console.log($('#i2').position())    //针对父标签相对位置
+
+</script>
+</html>

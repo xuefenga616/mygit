@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript">
+    $.extend({  //拓展
+        "wupeiqi": function(){
+            return 123;
+        }
+    });
+
+    var ret = $.wupeiqi();
+    console.log(ret);
+</script>
+</html>

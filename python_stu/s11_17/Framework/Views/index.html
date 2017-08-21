@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1>{{ name }}</h1>
+    <h1>{{ age }}</h1>
+    <h1>{{ cur_time }}</h1>
+
+    <ul>
+        {% for item in user_list %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+
+    {% if num == 1 %}
+        <h1>111</h1>
+    {% else %}
+        <h1>222</h1>
+    {% endif %}
+</body>
+</html>

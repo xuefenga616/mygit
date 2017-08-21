@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <table border="1">
+            <thead></thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td onclick="GetPrev(this)">编辑</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>22</td>
+                    <td>33</td>
+                    <td onclick="GetPrev(this)">编辑</td>
+                </tr>
+                <tr>
+                    <td>111</td>
+                    <td>222</td>
+                    <td>333</td>
+                    <td onclick="GetPrev(this)">编辑</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <style>
+            .modal{
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                width: 400px;
+                height: 300px;
+                background-color: #ddd;
+                margin-left: -200px;
+                margin-top: -150px;
+            }
+            .hide{
+                display: none;
+            }
+        </style>
+        <div id="dialog" class="modal hide">
+            <form action="" method="get">
+                <p>主机名：<input type="text" id="hostname"></p>
+                <p>IP：<input type="text" id="ip"></p>
+                <p>端口：<input type="text" id="port"></p>
+
+                <input type="submit" onclick="return SubmitForm();" value="提交"/>
+                <input type="button" onclick="Cancel();" value="取消"/>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //
+    });
+//    function get_prev(arg){
+//        var list = $(arg).siblings().map(function(){
+//            return $(this).text();
+//        });
+//        console.log(list[0],list[1],list[2]);
+//    }
+    function GetPrev(arg){
+        var list = []
+        $.each($(arg).prevAll(), function(i){
+            var item = $(arg).prevAll()[i];
+            var text = $(item).text();
+            list.push(text)
+        });
+        var list = list.reverse();   //翻转列表
+        console.log(list)
+
+        $("#hostname").val(list[0]);    //开始赋值
+        $("#ip").val(list[1]);    //开始赋值
+        $("#port").val(list[2]);    //开始赋值
+
+        $("#dialog").removeClass("hide");
+    }
+
+    function Cancel(){
+        $("#dialog").addClass("hide");
+    }
+
+    function SubmitForm(){
+        ret = true
+        //遍历所有的input，只要有空值，就将ret设置为false
+        $(":text").each(function(){     //:text是找到类型是text的元素
+            var value = $(this).val()   //$(this)是当前元素
+            if(value.trim().length == 0){
+                $(this).css('border-color','red');
+                ret = false
+            }else{
+                $(this).css('border-color','green');
+            }
+        });
+        return ret
+    }
+</script>
+</html>

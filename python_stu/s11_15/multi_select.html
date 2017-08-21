@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .hide{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <table border="1">
+        <thead></thead>
+        <tbody id="tb1">
+            <input type="button" onclick="CheckAll()" value="全选">
+            <input type="button" onclick="CheckReverse()" value="反选">
+            <input type="button" onclick="CheckCancel()" value="取消">
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>11</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>22</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>33</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //
+    });
+
+    function CheckAll(){
+        //$("#tb1").find(":checkbox").attr("checked","checked");
+        $("#tb1").find(":checkbox").prop("checked",true);
+    }
+    function CheckReverse(){
+        $("#tb1").find(":checkbox").each(function(){
+            if($(this).prop("checked")){
+                $(this).prop("checked",false);
+            }else{
+                $(this).prop("checked",true);
+            }
+        });
+    }
+    function CheckCancel(){
+        //$("#tb1").find(":checkbox").removeAttr("checked");
+        $("#tb1").find(":checkbox").prop("checked",false);
+    }
+
+</script>
+</html>
