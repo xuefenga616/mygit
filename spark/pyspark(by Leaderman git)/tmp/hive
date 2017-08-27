@@ -1,0 +1,12 @@
+sh hive --service metastore  --hiveconf javax.jdo.option.ConnectionURL=jdbc:mysql://10.210.136.64/hive_metastore_datacubic  --hiveconf javax.jdo.option.ConnectionUserName=hive2 --hiveconf javax.jdo.option.ConnectionPassword=qwe123 --hiveconf hive.metastore.warehouse.dir=hdfs://testhadoop/user/datacubic/warehouse --hiveconf hive.metastore.uris=thrift://10.210.136.64:9084 -p 9084 >> /var/log/hive/hivemetastore_9084.log 2>&1 &
+
+sh hive —service metastore  —hiveconf javax.jdo.option.ConnectionURL=jdbc:mysql://10.210.136.64/hive_metastore_topweibo  —hiveconf javax.jdo.option.ConnectionUserName=hive1 —hiveconf javax.jdo.option.ConnectionPassword=qwe123 —hiveconf hive.metastore.warehouse.dir=hdfs://testhadoop/user/topweibo/warehouse  —hiveconf hive.metastore.uris=thrift://10.210.136.64:9083 -p 9083 >> /var/log/hive/hivemetastore_9083.log 2>&1 &
+
+
+
+
+hive --service metastore --hiveconf javax.jdo.option.ConnectionURL=jdbc:mysql://m6103i.eos.grid.sina.com.cn:6103/hive_metastore_topweibo --hiveconf hive.metastore.warehouse.dir=hdfs://eosdip/user/topweibo/warehouse --hiveconf hive.metastore.uris=thrift://10.13.56.31:9083 -p 9083 >> /var/log/hive/hiveserver2_metastore_9083.log 2>&1 &
+
+hive --service metastore --hiveconf javax.jdo.option.ConnectionURL=jdbc:mysql://m6103i.eos.grid.sina.com.cn:6103/hive_metastore_datacubic --hiveconf hive.metastore.warehouse.dir=hdfs://eosdip/user/datacubic/warehouse --hiveconf hive.metastore.uris=thrift://10.13.56.31:9084 -p 9084 >> /var/log/hive/hiveserver2_metastore_9084.log 2>&1 &
+
+CREATE FUNCTION func.ipToLocationBySina AS 'com.sina.dip.hive.function.IPToLocationBySina' USING JAR 'hdfs://testhadoop/user/hive/func/location.jar';

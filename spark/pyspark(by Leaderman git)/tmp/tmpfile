@@ -1,0 +1,43 @@
+DIP平台会议纪要--20160226
+
+下周工作
+
+1. 确认微博头条目前于DIP平台部署哪些业务（实时、离线），对哪些服务有直接或者间接依赖，以及故障容忍度评估 --yurun（今天完成并更新至Wiki）
+
+2. Hadoop Yarn Queue（CPU、MEM）数据采集至ES，且使用Kibana展示 -- hexiang（今天完成）
+
+3. Spark Log数据采集 -- hexiang（下周完成）
+
+4. Kafka、Hadoop、Spark相关业务接入流程优化 -- hexiang、yurun（1-3周完成）
+
+5. Hadoop离线集群扩充5台机器（Hadoop Yarn On Docker）-- tongwei、yurun（根据系统升级CentOS时间确定，争取下周完成上线）
+
+6. DIP整体业务梳理，相关内容可参考1 -- yurun、hexiang
+
+7. Salt管理机需要备份 -- hexaing （比较紧急，优先处理）
+
+8. 微博橱窗实时数据业务线上环境部署及相关模块开发 -- zequn、yurun
+
+9. Storm容量评估 -- hexiang
+
+
+后续跟进
+
+1. 数据库Hadoop集群托管，拆分之后并入DIP集群 -- hexiang
+
+2. ZooKeeper迁移是否完成 -- hexiang
+
+3. Hadoop On Docker性能测试、用户权限问题 -- tongwei
+
+4. REST API数据接入系统调研 -- yurun
+
+5. Spark产品化 -- yurun
+
+6. Flume To HDFS实时数据落地小文件优化 -- tongwei
+
+
+
+
+
+
+

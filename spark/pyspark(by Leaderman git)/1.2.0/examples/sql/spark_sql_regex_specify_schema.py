@@ -1,0 +1,45 @@
+from pyspark import SparkConf, SparkContext
+from pyspark.sql import HiveContext, StructType, StructField, StringType
+import re
+
+conf = SparkConf().setAppName("spark_sql_regex_specify_schema")
+
+sc = SparkContext(conf=conf)
+
+hc = HiveContext(sc)
+
+source = sc.parallelize(["row1_col1 row1_col2 row1_col3",
+                         "row2_col1 row2_col2 row3_col3", "row3_col1 row3_col2 row3_col3"])
+
+pattern = re.compile("(.*) (.*) (.*)")
+
+
+def parse(line):
+    matcher = pattern.match(line)
+
+    if matcher:
+        return matcher.groups()
+    else:
+        return None
+
+columns = source.map(parse).filter(
+    lambda columns: columns and len(columns) == 3)
+
+rows = columns.map(
+    lambda columns: (columns[0], columns[1], columns[2]))
+
+schema = StructType([StructField("col1", StringType(), False), StructField(
+    "col2", StringType(), False), StructField("col3", StringType(), False)])
+
+
+table = hc.applySchema(rows, schema)
+
+table.registerAsTable("temp_mytable")
+
+datas = hc.sql("select * from temp_mytable").collect()
+
+sc.stop()
+
+if datas:
+    for data in datas:
+        print data
